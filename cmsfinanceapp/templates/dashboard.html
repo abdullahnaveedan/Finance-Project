@@ -1,0 +1,558 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bootstrap demo</title>
+    <link rel="stylesheet" href="{%static 'css/style.css'%}" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.js"
+      integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+      crossorigin="anonymous"
+    ></script>
+    <script src="{%static 'js/GaugeMeter.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+  </head>
+
+  <body class="">
+    <nav
+      class="navbar bg-dark border-bottom border-body"
+      style="height: 3.5rem !important"
+      data-bs-theme="dark"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand">Finance </a>
+        <div class="img-section d-flex text-light" style="margin-top: 0.56rem">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="30"
+            height="30"
+            fill="currentColor"
+            class="bi bi-person-circle mx-3"
+            viewBox="0 0 16 16"
+          >
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+            <path
+              fill-rule="evenodd"
+              d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
+            />
+          </svg>
+          <p class="mt-1">Muhammad A</p>
+        </div>
+      </div>
+    </nav>
+    <div class="container-fluid">
+      <div class="d-flex main-ctr pt-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="25"
+          height="25"
+          fill="currentColor"
+          class="bi bi-text-left mt-2 mx-2"
+          viewBox="0 0 15 15"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"
+          />
+        </svg>
+        <h2>Dashboard</h2>
+      </div>
+    </div>
+    <div class="container-fluid text-center">
+      <div class="row speedometer pt-4 px-4">
+        <h5 class="text-start">Averages</h5>
+
+        {% for key,value in dataset_mean.items %}
+        <div class="col-lg rounded m-1">
+          <div class="Preview">
+            <div class="d-flex pt-2 justify-content-between">
+              <p class="text-start" style="width: 11rem">{{key }}</p>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                width="25"
+                height="25"
+              >
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g
+                  id="SVGRepo_tracerCarrier"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></g>
+                <g id="SVGRepo_iconCarrier">
+                  <path
+                    d="M21 7L13 15L9 11L3 17M21 7H15M21 7V13"
+                    stroke="#001A72"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>
+                </g>
+              </svg>
+            </div>
+            <p style="overflow: hidden">{{value|floatformat:2}}</p>
+          </div>
+        </div>
+        {% endfor %}
+
+        <div class="col-lg-8 rounded mt-1">
+          <p class="pt-2 text-start">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-graph-up-arrow"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            Captial Balance Index
+          </p>
+          <canvas
+            id="myChart"
+            style="width: 100%; max-width: 100%; height: 80%"
+          ></canvas>
+        </div>
+        <div class="col-lg-4 actual-price p-0 px-1">
+          <div class="d-flex flex-wrap">
+            <div class="mt-1 p-2 rounded overflow-scroll" style="width: 49%">
+              <p class="text-start">Total Customers</p>
+              <h4 class="text-start"><b>{{dataset_length}}</b></h4>
+            </div>
+            <div
+              class="mt-1 p-2 mx-1 rounded overflow-scroll"
+              style="width: 48.5%"
+            >
+              <p class="text-start">Unique Customers</p>
+              <h4 class="text-start"><b>{{Unique_customers}}</b></h4>
+            </div>
+          </div>
+
+          <div class="chart rounded mt-2 ">
+            <p class="pt-3 text-start px-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-pie-chart-fill"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M15.985 8.5H8.207l-5.5 5.5a8 8 0 0 0 13.277-5.5zM2 13.292A8 8 0 0 1 7.5.015v7.778zM8.5.015V7.5h7.485A8 8 0 0 0 8.5.015"
+                />
+              </svg>
+              Loan Size Category
+            </p>
+            <canvas
+              id="doughnutChart"
+              style="width: 100%; max-width: 22rem; height: 15rem"
+            ></canvas>
+            <br />
+          </div>
+        </div>
+
+        <div class="col-lg-6 rounded mt-2" class="mx-1">
+          <p class="pt-2 text-start">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-graph-up-arrow"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            Loan Performance over Years
+          </p>
+          <!-- <canvas id="myChart1"  "></canvas> -->
+          <canvas id="stackedChartID"></canvas>
+        </div>
+        <div class="col-lg-6 rounded mt-2">
+          <p class="pt-2 text-start">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-graph-up-arrow"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            Loan Age Distribution
+          </p>
+          <canvas id="get_time_off"></canvas>
+        </div>
+        <div class="col-md-6 rounded mt-2">
+          <p class="pt-2 text-start">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-graph-up-arrow"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            Months in Arrears Distribution
+          </p>
+          <canvas
+            id="months_distribution"
+            style="width: 100%; max-width: 700px"
+          ></canvas>
+        </div>
+        <div class="col rounded mt-2">
+          <p class="pt-2 text-start">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-graph-up-arrow"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+            Time to Write-Off Distribution
+          </p>
+          <canvas id="write_off" style="width: 100%; max-width: 700px"></canvas>
+        </div>
+
+        <div class="col-12 rounded mt-3" style="overflow: scroll">
+          <p class="pt-2 text-start"> Loan Performance over Years</p>
+          <table class="table table-striped mt-4">
+            <thead>
+              <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Year</th>
+                  <th scope="col">Total Disbursement Amount</th>
+                  <th scope="col">Capital Balance</th>
+                  <th scope="col">Difference</th>
+                  <th scope="col">Percentage Difference</th>
+                  <th scope="col">Commulative Percentage Difference</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in group %}
+              <tr>
+                  <th scope="row">{{ forloop.counter }}</th>
+                  <td>{{ row.0|floatformat:0 }}</td>
+                  <td>{{ row.1|floatformat:2 }}</td>
+                  <td>{{ row.2|floatformat:2 }}</td>
+                  <td>{{ row.3|floatformat:2 }}</td>
+                  <td>{{ row.4|floatformat:2 }}</td>
+                  <td>{{ row.5|floatformat:2 }}</td>
+              </tr>
+          {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer
+      class="bg-dark border-bottom border-body mt-4"
+      style="height: 3.5rem !important"
+      data-bs-theme="dark"
+    >
+      <div class="container-fluid text-center pt-3 text-light">
+        <a class="">Finance-2024  </a>
+      </div>
+    </footer>
+
+    <script>
+      
+      {% comment %} loan_age_distribution Graph Line bar Graph  2nd graph{% endcomment %}
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var xValues_doubleBar = {{ loan_age_distribution.x|safe }};
+        var yValues_doubleBar = {{ loan_age_distribution.y|safe }};
+    
+        var ctx = document.getElementById('get_time_off').getContext('2d');
+        var comboChart = new Chart(ctx, {
+            type: 'bar', // Set the initial type to bar
+            data: {
+                labels: xValues_doubleBar,
+                datasets: [
+                    {
+                        label: ' ',
+                        backgroundColor: 'rgba(255, 99, 132, 0.31)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        data: yValues_doubleBar // Dataset
+                    },
+                    {
+                        label: ' ',
+                        type: 'line',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        fill: false,
+                        data: yValues_doubleBar // Dataset
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'category', // Specify the scale type for x-axis as category
+                        labels: 'xValues_doubleBar', // Assign labels for x-axis
+                        beginAtZero: true
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+    
+     {% comment %} proportion_by_loan_size doughnut {% endcomment %}
+
+     
+      document.addEventListener('DOMContentLoaded', function () {
+        var xValues_doughnut_nested = {{ proportion_by_loan_size.x|safe }};
+        var yValues_doughnut_nested = {{ proportion_by_loan_size.y|safe }};
+        
+        // Extract the inner lists
+        var xValues_doughnut = xValues_doughnut_nested[0];
+        var yValues_doughnut = yValues_doughnut_nested[0];
+
+        var barColors = ["#b91d47", "#00aba9", "#2b5797"];
+
+        new Chart("doughnutChart", {
+            type: "doughnut",
+            data: {
+                labels: xValues_doughnut,
+                datasets: [{
+                    backgroundColor: barColors,
+                    data: yValues_doughnut
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Loan Size Category"
+                }
+            }
+        });
+    });
+
+    {% comment %} Line bar graph 3rd Graph or 2nd last {% endcomment %}
+    document.addEventListener('DOMContentLoaded', function () {
+      var xValues_doubleBar = {{ months_in_arrears_distribution.x|safe }};
+      var yValues_doubleBar = {{ months_in_arrears_distribution.y|safe }};
+
+    var ctx2 = document.getElementById('months_distribution').getContext('2d');
+    var comboChart = new Chart(ctx2, {
+        type: 'bar', // Set the initial type to bar
+        data: {
+            labels: xValues_doubleBar,
+            datasets: [
+                {
+                    label: ' ',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    data: yValues_doubleBar
+                },
+                {
+                    label: ' ',
+                    type: 'line',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    fill: false,
+                    data: yValues_doubleBar
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+  });
+
+  {% comment %} Line Graph  {% endcomment %}
+    document.addEventListener('DOMContentLoaded', function () {
+      var xValues_lineGraph_nested = {{ lineGraph.x|safe }};
+      var yValues_lineGraph_nested = {{ lineGraph.y|safe }};
+      
+      var xValues_line = xValues_lineGraph_nested[0];
+      var yValues_line = yValues_lineGraph_nested[0];
+
+    new Chart("myChart", {
+        type: "line",
+        data: {
+            labels: xValues_line,
+            datasets: [{
+                fill: false,
+                lineTension: 0,
+                backgroundColor: "red",
+                borderColor: "rgba(1, 115, 24,0.6)",
+                data: yValues_line
+            }]
+        },
+        options: {
+            legend: { display: false },
+            scales: {
+                yAxes: [{ ticks: { min: 6 } }],
+            }
+        }
+    });
+  });
+
+
+  {% comment %} Stack bar {% endcomment %}
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var xValues_doubleBar_nested = {{ doublebar.x|safe }};
+    var yValues_doubleBar_nested = {{ doublebar.y|safe }};
+    var zValues_doubleBar_nested = {{ doublebar.z|safe }};
+
+    var xValues_doubleBar = xValues_doubleBar_nested[0];
+    var yValues_doubleBar = yValues_doubleBar_nested[0];
+    var zValues_doubleBar = zValues_doubleBar_nested[0];
+
+    var myContext = document.getElementById("stackedChartID").getContext('2d');
+    var myChart = new Chart(myContext, {
+        type: 'bar',
+        data: {
+            labels: xValues_doubleBar,
+            datasets: [{
+                label: 'Disbursed',
+                backgroundColor: "orange",
+                data: yValues_doubleBar,
+                stack: 'Stack 0',
+            }, {
+                label: 'Write Off',
+                backgroundColor: "#61bdfa",
+                data: zValues_doubleBar,
+                stack: 'Stack 1'
+            }],
+        },
+        options: {
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Chart.js Bar Chart - Stacked'
+                },
+            },
+            interaction: {
+                intersect: false,
+            },
+            scales: {
+              xAxes: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'X-Axis Label'
+                    }
+                },
+                yAxes: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Y-Axis Label'
+                    }
+                }
+            },
+            responsive: true
+        }
+    });
+});
+
+{% comment %} Line bar graph Last Graph {% endcomment %}
+
+document.addEventListener('DOMContentLoaded', function () {
+  var xValues_doubleBar = {{ time_to_write_off.x|safe }};
+  var yValues_doubleBar = {{ time_to_write_off.y|safe }};
+
+  var ctx = document.getElementById('write_off').getContext('2d');
+  var comboChart = new Chart(ctx, {
+      type: 'bar', // Set the initial type to bar
+      data: {
+          labels: xValues_doubleBar,
+          datasets: [
+              {
+                  label: ' ',
+                  backgroundColor: 'rgba(101, 117, 240,0.2)',
+                  borderColor: 'rgba(101, 117, 240, 1)',
+                  borderWidth: 1,
+                  data: yValues_doubleBar // Dataset
+              },
+              {
+                  label: ' ',
+                  type: 'line',
+                  borderColor: 'rgba(4, 130, 25, 1)',
+                  borderWidth: 2,
+                  fill: false,
+                  data: yValues_doubleBar // Dataset
+              }
+          ]
+      },
+      options: {
+          scales: {
+              x: {
+                  type: 'category', // Specify the scale type for x-axis as category
+                  labels: 'xValues_doubleBar', // Assign labels for x-axis
+                  beginAtZero: true
+              },
+              y: {
+                  beginAtZero: true
+              }
+          }
+      }
+  });
+});
+
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+      integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="{%static 'js/charts.js'%}"></script>
+  </body>
+</html>

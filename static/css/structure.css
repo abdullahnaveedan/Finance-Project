@@ -1,0 +1,122 @@
+.shift-first{
+    width: 20%;
+    height:100vh;
+    float: left;
+    background-color: #041134;
+}
+.shift-second{
+    width: 80%;
+    height:100vh;
+    float: right;
+    background: rgb(36,62,126);
+background: linear-gradient(90deg, rgba(36,62,126,1) 26%, rgba(12,115,148,1) 100%);
+}
+
+.shift-second .container{ 
+    width: 70%;
+    border-radius: 1rem;
+    margin-top: 5rem;
+    height: 85vh;
+    box-shadow: 0.65rem 0.65rem 1rem;
+    background-color: #17375e;
+}
+.sign-up-page .svg svg{
+    border :7px solid #fff;
+    border-radius: 50%;
+    padding: 0.55rem;
+}
+.sign-up-page form input{
+    border-radius: 3rem;
+}
+.otp form input{
+    border-radius: 0.5rem;
+}
+.already a{
+    text-decoration: none;
+    color: #49abcd;
+    font-weight: 400;
+}
+.ootp .container{
+    height: 69vh !important;
+}
+.otp svg{
+    border: none !important;
+    padding: 0 !important;
+    border-radius: 0% !important;
+}
+.otpget input{
+    font-weight: 600;
+    text-align: center;
+    font-size: 30px;
+}
+
+.otp input::-webkit-outer-spin-button,
+.otp input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.otp input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.otp input{
+    border-radius: none !important;
+}
+.fp{
+    padding-top: 4rem;
+}
+.fp .container{ 
+    width: 70%;
+    border-radius: 1rem;
+    margin-top: 5rem;
+    height: 58vh !important;
+}
+
+.time{
+    font-weight: 600;
+}
+.userloginpage .forpas{
+    float: right;
+}
+
+@media only screen and (max-width: 500px) {
+    .shift-first{
+        display: none;
+    }
+    .shift-second{
+        width: 100%;
+    }
+    .shift-second .container{ 
+        width: 90%;
+        margin-top: 3rem;
+        height: 80vh;
+    }
+    .otpget input{
+        margin-right: 0 !important;
+        margin-left: 0.4rem !important ;
+    }
+
+}
+
+
+/* Tablet */
+@media(min-width: 501px) and (max-width: 768px) {
+    .shift-first{
+        display: none;
+    }
+    .shift-second{
+        width: 100%;
+    }
+    .shift-second .container{ 
+        width: 90%;
+        margin-top: 3rem;
+        height: 80vh;
+    }
+    .otpget input{
+        margin-right: 0.2rem !important;
+        height: 5rem;
+        margin-left: 0.8rem !important ;
+    }
+}

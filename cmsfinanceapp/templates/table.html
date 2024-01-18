@@ -1,0 +1,37 @@
+{% extends "structure.html" %}
+{% block title %}
+Table
+{% endblock title %}
+
+{% block shiftsecond %}
+
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Year</th>
+        <th scope="col">Total Disbursement Amount</th>
+        <th scope="col">Capital Balance</th>
+        <th scope="col">Difference</th>
+        <th scope="col">Percentage Difference</th>
+        <th scope="col">Commulative Percentage Difference</th>
+      </tr>
+    </thead>
+    <tbody>
+
+
+        {% for row in group %}
+        <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ row.0 }}</td>
+            <td>{{ row.1 }}</td>
+            <td>{{ row.2 }}</td>
+            <td>{{ row.3 }}</td>
+            <td>{{ row.4 }}</td>
+            <td>{{ row.5 }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock shiftsecond %}
