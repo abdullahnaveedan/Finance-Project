@@ -252,8 +252,8 @@ def otp_validation(request):
 
         # Determine the context (signup or forget password)
         context = request.session.get('otp_context')
-        
-        if context == 'signup':
+        print("context = ", context)
+        if context == 'sign_up':
             # Retrieve validated user data from the session
             validated_user_data = request.session.get('validated_user_data', None)
 
@@ -272,10 +272,10 @@ def otp_validation(request):
                 user = authenticate(request, username=validated_user_data['username'], password=validated_user_data['password'])
                 if user is not None:
                     auth_login(request, user)
-                    return render(request, "upload_file.html")
+                    return redirect("upload-file")
             else:
                 # Incorrect OTP, redirect to sign_up.html
-                messages.error(request, "Incorrect OTP. Please try again.")
+                print("Incorrect OTP. Please try again.")
                 return render(request, "sign_up.html")
 
         elif context == 'forget_password':
@@ -285,11 +285,11 @@ def otp_validation(request):
             if forget_password_data and entered_otp == forget_password_data['otp']:
                 # OTP validation successful, proceed with forget password logic
                 # (e.g., allow the user to reset their password)
-                return render(request, "forget_password.html")
+                return render(request, "reset_password.html")
             else:
                 # Incorrect OTP, redirect to forget_password.html
                 messages.error(request, "Incorrect OTP. Please try again.")
-                # return render(request, "sign_up.html")
+                return render(request, "otp.html")
             
         elif context == 'reset_password':
             # Retrieve forget password data from the session
@@ -345,11 +345,8 @@ def sign_up(request):
 
 
 def forget_password(request):
-    
     if request.method == "POST":
         getEmail = request.POST.get("email")
-
-
         # Check if the email exists in the database
         try:
             user = User.objects.get(email=getEmail)
@@ -362,6 +359,7 @@ def forget_password(request):
         send_otp_email(getEmail, otp)
 
         request.session['otp_context'] = 'forget_password'
+        print("Session = ", request.session.get('otp_context'))
         request.session['forget_password'] = {
             'email': getEmail,
             'otp': otp,
