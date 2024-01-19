@@ -12,7 +12,11 @@ urlpatterns = [
     path('sign-up/',views.sign_up,name="sign_up"),#working
     path('sign-out/',views.sign_out,name="sign_out"),#working
     path("forget_password/", views.forget_password, name="forget_password"),
-    path("otp/", views.otp_validation, name="otp_validation"),
+    path("otp_validation/", views.otp_validation, name="otp_validation"),
     path("reset_password/", views.reset_password, name="reset_password"),
-    path("table-data/", views.get_table_data, name="")
+    path("table-data/", views.get_table_data, name=""),
+    path("upload-file/", views.upload_file, name="upload-file"),
+    path("submit_excel/", views.submit_excel, name="submit_excel"),
+    path('show_forget_password/',views.show_forget_password,name="show_forget_password"),#working
+ 
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

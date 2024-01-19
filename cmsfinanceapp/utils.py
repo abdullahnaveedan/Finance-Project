@@ -13,5 +13,6 @@ def send_otp_email(email, otp):
     """Send OTP to the specified email address."""
     subject = 'Your OTP for Verification'
     message = f'''Your OTP is:{otp}. Please don't share it with any one.'''
+    print(otp)
     from_email = settings.EMAIL_HOST_USER  # Update with your SMTP email
     send_mail(subject, message, from_email, [email])

@@ -14,7 +14,10 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import seaborn as sns
 from collections import OrderedDict
-
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 
 def get_table_data(file_path):
@@ -65,11 +68,15 @@ def get_table_data(file_path):
     
     return group
 # Create your views here.
-#@login_required(login_url='sign_in') 
 
+@login_required(login_url='sign_in') 
 def index(request):
-<<<<<<< HEAD
-    file_path = r'media/excel/Chat GPT2-English.xlsx'
+    data = file_data.objects.filter(username = request.user).order_by('-id')
+    latest_record = data.first()
+    file = latest_record.excel_file
+
+    file_path = 'media/' + str(file)
+
     try:
         data = pd.read_excel(file_path)
         group = get_table_data(file_path)
@@ -163,7 +170,7 @@ def index(request):
         write_off_values_updated[index] = write_off_values[i]
     
     # Read and send excel file
-    print(group)
+ 
     context = {
              'dataset_mean' : toMean, # Done Speedometer
              'dataset_length':dataset_len, # Done mini-1
@@ -176,25 +183,8 @@ def index(request):
              'proportion_by_loan_size': {'x':[loanSizeIndex],'y':[loanSizeValues]} ,# Done PIE
              'group' : group
             }                       
-    return render(request, "dashboard.html", context)
-=======
-    # isalnum
-    return render(request, "sign_in.html")
-
-def show_sign_in(request):
-    # isalnum
-    return render(request, "sign_in.html")
-
-def show_sign_up(request):
-    # isalnum
-    return render(request, "sign_up.html")
-
-def show_forget_password(request):
-    # isalnum
-    return render(request, "forget_password.html")
->>>>>>> 1dc64f7c3724c683c63729aa64ea27653a136e09
-
-
+    return render(request, "dashboard.html",context )
+    
 def sign_in(request):
     if request.method == "POST":
             username = request.POST.get("username")
@@ -213,9 +203,6 @@ def sign_in(request):
                 messages.warning(request, 'Wrong credentials.')
         
     return render(request, "sign_in.html")
-
-
-
 
 def sign_out(request):
     if request.user.is_authenticated:
@@ -265,7 +252,7 @@ def otp_validation(request):
 
         # Determine the context (signup or forget password)
         context = request.session.get('otp_context')
-
+        
         if context == 'signup':
             # Retrieve validated user data from the session
             validated_user_data = request.session.get('validated_user_data', None)
@@ -302,7 +289,7 @@ def otp_validation(request):
             else:
                 # Incorrect OTP, redirect to forget_password.html
                 messages.error(request, "Incorrect OTP. Please try again.")
-                return render(request, "sign_up.html")
+                # return render(request, "sign_up.html")
             
         elif context == 'reset_password':
             # Retrieve forget password data from the session
@@ -409,3 +396,32 @@ def reset_password(request):
 
     return render(request, "reset_password.html")
 
+def upload_file(request):
+   
+    return render(request, "upload_file.html")
+
+def submit_excel(request):
+    if request.method == "POST":
+        excel = request.FILES.get("excelFile" , None)
+        file_name = ''
+        if excel:
+                file_name = str(excel)
+                file_name = default_storage.save('excel/' + file_name, ContentFile(excel.read()))
+                input_excel = file_name
+        else:
+            input_excel = ''
+        file_data(username = request.user, excel_file = input_excel).save()
+        return redirect("index")
+    return redirect("upload-file")
+
+def show_sign_in(request):
+    
+    return render(request, "sign_in.html")
+
+def show_sign_up(request):
+    
+    return render(request, "sign_up.html")
+
+def show_forget_password(request):
+    
+    return render(request, "forget_password.html")
