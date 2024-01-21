@@ -51,7 +51,9 @@ HEADER {
 display: none;
 }
 
-
+nav{
+ 
+}
 .sec .col-md-8 {
   height: 18rem !important;
   overflow: auto;

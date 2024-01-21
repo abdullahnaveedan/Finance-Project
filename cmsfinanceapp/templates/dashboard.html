@@ -1,4 +1,5 @@
 {% load static%}
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -21,32 +22,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
   </head>
 
-  <body class="">
-    <nav
-      class="navbar bg-dark border-bottom border-body"
-      style="height: 4.5rem !important"
-      data-bs-theme="dark"
-    >
+  <body>
+    <nav class="navbar navbar-expand-lg"  style="background-color: black;">  
       <div class="container-fluid">
-        <a class="navbar-brand">Finance </a>
-        <div class="img-section d-flex text-light" style="margin-top: 0.56rem">
-          <a href="upload-file" class="btn btn-info mx-2"> + Upload new file</a>
-          <a href="sign-out" class="btn btn-success mx-2">SignOut</a>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="30"
-            height="30"
-            fill="currentColor"
-            class="bi bi-person-circle mx-3"
-            viewBox="0 0 16 16"
-          >
-            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-            <path
-              fill-rule="evenodd"
-              d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
-            />
-          </svg>
-          <p class="mt-1"><b>Hello,{{request.user.username}} </b></p>
+        <a class="navbar-brand text-light" href="#">Finance</a>
+        <button class="navbar-toggler text-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav text-light">
+            <li class="nav-item ">
+              <a class="nav-link active text-light" aria-current="page" href="upload-file">Upload File</a>
+            </li>
+            
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle text-light text-capitalize" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                {{request.user.username}}
+              </a>
+              <ul class="dropdown-menu">
+       
+                <li><a class="dropdown-item text-danger" href="sign-out">Sign Out</a></li>
+              </ul>
+            </li>
+          </ul>
         </div>
       </div>
     </nav>
@@ -65,8 +63,11 @@
             d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"
           />
         </svg>
-        <h2>Dashboard</h2>
+        <h2 style="float: left;">Dashboard</h2>
       </div>
+    </div>
+    <div class="container-fluid mx-2 mt-2 pridictPrice">
+      <h2 class="text-center" style="font-weight: 700;">Price : $120,000</h2>
     </div>
     <div class="container-fluid text-center">
       <div class="row speedometer pt-4 px-4">
@@ -267,9 +268,9 @@
               <tr>
                   <th scope="row">{{ forloop.counter }}</th>
                   <td>{{ row.0|floatformat:0 }}</td>
-                  <td>${{ row.1|floatformat:2 }}</td>
-                  <td>${{ row.2|floatformat:2 }}</td>
-                  <td>${{ row.3|floatformat:2 }}</td>
+                  <td>${{ row.1|floatformat:2|intcomma }}</td>
+                  <td>${{ row.2|floatformat:2|intcomma }}</td>
+                  <td>${{ row.3|floatformat:2|intcomma }}</td>
                   <td>{{ row.4|floatformat:2 }}%</td>
                   <td>{{ row.5|floatformat:2 }}%</td>
               </tr>
@@ -539,21 +540,16 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
     </script>
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" 
+            crossorigin="anonymous"></script>
+
     <script
       src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
       integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
       crossorigin="anonymous"
     ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
-      integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-      crossorigin="anonymous"
-    ></script>
+    
 
     <script src="{%static 'js/charts.js'%}"></script>
   </body>

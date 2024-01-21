@@ -196,14 +196,14 @@ def sign_in(request):
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
+                messages.success(request, 'Login Success.')
                 auth_login(request, user)
-
                 # Store the user's email in the session
                 request.session['email'] = user.email
 
                 return render(request, "upload_file.html")
             else:
-                messages.warning(request, 'Wrong credentials.')
+                messages.warning(request, 'Invalid email or password. Please try again.')
 
     return render(request, "sign_in.html")
 
@@ -353,7 +353,7 @@ def forget_password(request):
         try:
             user = User.objects.get(email=getEmail)
         except User.DoesNotExist:
-            messages.error(request, "Email does not exist. Please enter a valid email.")
+            messages.error(request, "Email does not exist. Please Enter a valid email.")
             return render(request, "sign_in.html")
 
         # Generate and send OTP
