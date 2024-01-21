@@ -30,7 +30,7 @@
       <div class="container-fluid">
         <a class="navbar-brand">Finance </a>
         <div class="img-section d-flex text-light" style="margin-top: 0.56rem">
-          <a href="upload-file" class="btn btn-info mx-2"> + Uplaod new file</a>
+          <a href="upload-file" class="btn btn-info mx-2"> + Upload new file</a>
           <a href="sign-out" class="btn btn-success mx-2">SignOut</a>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +46,7 @@
               d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
             />
           </svg>
-          <p class="mt-1"><b>Hello, </b> {{request.user.username}} </p>
+          <p class="mt-1"><b>Hello,{{request.user.username}} </b></p>
         </div>
       </div>
     </nav>
@@ -267,11 +267,11 @@
               <tr>
                   <th scope="row">{{ forloop.counter }}</th>
                   <td>{{ row.0|floatformat:0 }}</td>
-                  <td>{{ row.1|floatformat:2 }}</td>
-                  <td>{{ row.2|floatformat:2 }}</td>
-                  <td>{{ row.3|floatformat:2 }}</td>
-                  <td>{{ row.4|floatformat:2 }}</td>
-                  <td>{{ row.5|floatformat:2 }}</td>
+                  <td>${{ row.1|floatformat:2 }}</td>
+                  <td>${{ row.2|floatformat:2 }}</td>
+                  <td>${{ row.3|floatformat:2 }}</td>
+                  <td>{{ row.4|floatformat:2 }}%</td>
+                  <td>{{ row.5|floatformat:2 }}%</td>
               </tr>
           {% endfor %}
             </tbody>
@@ -291,13 +291,13 @@
     </footer>
 
     <script>
-      
+
       {% comment %} loan_age_distribution Graph Line bar Graph  2nd graph{% endcomment %}
 
       document.addEventListener('DOMContentLoaded', function () {
         var xValues_doubleBar = {{ loan_age_distribution.x|safe }};
         var yValues_doubleBar = {{ loan_age_distribution.y|safe }};
-    
+
         var ctx = document.getElementById('get_time_off').getContext('2d');
         var comboChart = new Chart(ctx, {
             type: 'bar', // Set the initial type to bar
@@ -335,14 +335,14 @@
             }
         });
     });
-    
+
      {% comment %} proportion_by_loan_size doughnut {% endcomment %}
 
-     
+
       document.addEventListener('DOMContentLoaded', function () {
         var xValues_doughnut_nested = {{ proportion_by_loan_size.x|safe }};
         var yValues_doughnut_nested = {{ proportion_by_loan_size.y|safe }};
-        
+
         // Extract the inner lists
         var xValues_doughnut = xValues_doughnut_nested[0];
         var yValues_doughnut = yValues_doughnut_nested[0];
@@ -409,7 +409,7 @@
     document.addEventListener('DOMContentLoaded', function () {
       var xValues_lineGraph_nested = {{ lineGraph.x|safe }};
       var yValues_lineGraph_nested = {{ lineGraph.y|safe }};
-      
+
       var xValues_line = xValues_lineGraph_nested[0];
       var yValues_line = yValues_lineGraph_nested[0];
 
