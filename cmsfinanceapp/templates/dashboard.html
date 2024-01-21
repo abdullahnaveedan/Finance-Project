@@ -24,12 +24,14 @@
   <body class="">
     <nav
       class="navbar bg-dark border-bottom border-body"
-      style="height: 3.5rem !important"
+      style="height: 4.5rem !important"
       data-bs-theme="dark"
     >
       <div class="container-fluid">
         <a class="navbar-brand">Finance </a>
         <div class="img-section d-flex text-light" style="margin-top: 0.56rem">
+          <a href="upload-file" class="btn btn-info mx-2"> + Uplaod new file</a>
+          <a href="sign-out" class="btn btn-success mx-2">SignOut</a>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="30"
@@ -44,7 +46,7 @@
               d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
             />
           </svg>
-          <p class="mt-1">Muhammad A</p>
+          <p class="mt-1"><b>Hello, </b> {{request.user.username}} </p>
         </div>
       </div>
     </nav>
