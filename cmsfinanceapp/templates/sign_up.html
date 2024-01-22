@@ -5,8 +5,8 @@
 <div class="shift-second">
     {% if messages %}
     {% for message in messages %}
-    <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible fade show mt-2" {% endif %}  style="position: absolute; left: 38%;"role="alert">
-      <strong>{{message}}</strong>
+    <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible fade show mt-2" {% endif %}  style="position: absolute; left: 38%;" role="alert">
+      <strong>{{ message }}</strong>
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %}
@@ -33,14 +33,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="firstname" class="form-label mx-3">First Name</label>
-                            <input type="text" class="form-control" name="firstname" id="firstname" placeholder="John" required>
+                            <input type="text" class="form-control" name="firstname" id="firstname" placeholder="John" value="{{ request.POST.firstname }}" required>
                         </div>
                     </div>
     
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="lastname" class="form-label mx-3">Last Name</label>
-                            <input type="text" class="form-control" name="lastname" id="lastname" placeholder="Doe" required>
+                            <input type="text" class="form-control" name="lastname" id="lastname" placeholder="Doe" value="{{ request.POST.lastname }}" required>
                         </div>
                     </div>
                 </div>
@@ -49,14 +49,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="username" class="form-label mx-3">Username</label>
-                            <input type="text" class="form-control" name="username" id="username" placeholder="JohnDoe22" required>
+                            <input type="text" class="form-control" name="username" id="username" placeholder="JohnDoe22" value="{{ request.POST.username }}" required>
                         </div>
                     </div>
     
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="email" class="form-label mx-3">Email</label>
-                            <input type="email" class="form-control" name="email" id="email" placeholder="john.doe@example.com" required>
+                            <input type="email" class="form-control" name="email" id="email" placeholder="john.doe@example.com" value="{{ request.POST.email }}" required>
                         </div>
                     </div>
                 </div>
@@ -96,8 +96,6 @@
         </div>
     </div>
     
-    
-
       </div>
   </div>
 </div>

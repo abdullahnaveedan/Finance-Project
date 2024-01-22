@@ -83,7 +83,7 @@ def index(request):
         data = pd.read_excel(file_path)
         group = get_table_data(file_path, dict_to_map)
     except Exception as e:
-        messages.warning(request , "Error processing the file.")
+        messages.warning(request ,"Error processing the file.")
     data = pd.read_excel(file_path)
     data = data.rename(columns = dict_to_map)
     cols_drop=['Customer Code','Disbursement Date','Date of Last Payment','Write-Off Date']
