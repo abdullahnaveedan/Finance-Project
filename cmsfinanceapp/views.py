@@ -190,20 +190,31 @@ def index(request):
 
 def sign_in(request):
     if request.method == "POST":
-            username = request.POST.get("username")
-            password = request.POST.get("password")
+        username = request.POST.get("username")
+        password = request.POST.get("password")
 
-            user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=username, password=password)
 
-            if user is not None:
-                messages.success(request, 'Login Success.')
-                auth_login(request, user)
-                # Store the user's email in the session
-                request.session['email'] = user.email
+        if user is not None:
+            # Display a success message (SUCCESS)
+            messages.success(request, 'SUCCESS: Login successful.')
+            auth_login(request, user)
+            # Store the user's email in the session
+            request.session['email'] = user.email
 
-                return render(request, "upload_file.html")
-            else:
-                messages.warning(request, 'Invalid email or password. Please try again.')
+            return render(request, "upload_file.html")
+        else:
+            # Display a warning message (WARNING)
+            messages.warning(request, 'WARNING: Invalid username or password. Please try again.')
+
+            # Retain entered data in the form fields
+            return render(request, "sign_in.html", {
+                'username': username,
+                'password': password,
+            })
+
+    # Display an informational message (INFO)
+    messages.info(request, 'INFO: Please enter your username and password to sign in.')
 
     return render(request, "sign_in.html")
 
@@ -216,46 +227,45 @@ def sign_out(request):
 #validate user's data provided by sing_up function
 def validate_data(first_name, last_name, username, email, password, confirm_password):
     if password != confirm_password:
-        return False, "Passwords do not match."
+        return False, "WARNING: Passwords do not match."
 
     if not re.match("^[a-zA-Z0-9]+$", username):
-        return False, "Username can only contain alphanumeric characters."
+        return False, "WARNING: Username can only contain alphanumeric characters."
 
     if User.objects.filter(username=username).exists():
-        return False, "Username is already taken. Choose a different one."
+        return False, "WARNING: Username is already taken. Choose a different one."
 
     if not re.match("^[a-zA-Z]+$", first_name):
-        return False, "First name can only contain alphabet characters."
+        return False, "WARNING: First name can only contain alphabet characters."
 
     if not re.match("^[a-zA-Z]+$", last_name):
-        return False, "Last name can only contain alphabet characters."
+        return False, "WARNING: Last name can only contain alphabet characters."
 
     if User.objects.filter(email=email).exists():
-        return False, "Email is already registered. Choose a different one."
+        return False, "WARNING: Email is already registered. Choose a different one."
 
     if not (any(c.isalpha() for c in password) and
             any(c.isdigit() for c in password) and
             any(c in "!@#$%^&*()-_=+[]{}|;:'\",.<>/?`~" for c in password) and
             len(password) >= 8):
-        return False, "Password must contain at least one alphabet character, one digit, one special character, and be at least 8 characters long."
+        return False, "WARNING: Password must contain at least one alphabet character, one digit, one special character, and be at least 8 characters long."
 
-    return True, "Validation successful."
+    return True, "SUCCESS: Validation successful."
 
 
 #performing otp validation by request from otp.html
 def otp_validation(request):
     if request.method == "POST":
-        if request.method == "POST":
-            entered_otp = (
-                request.POST.get("otp-1", "") +
-                request.POST.get("otp-2", "") +
-                request.POST.get("otp-3", "") +
-                request.POST.get("otp-4", "")
-            )
+        entered_otp = (
+            request.POST.get("otp-1", "") +
+            request.POST.get("otp-2", "") +
+            request.POST.get("otp-3", "") +
+            request.POST.get("otp-4", "")
+        )
 
         # Determine the context (signup or forget password)
         context = request.session.get('otp_context')
-        print("context = ", context)
+
         if context == 'sign_up':
             # Retrieve validated user data from the session
             validated_user_data = request.session.get('validated_user_data', None)
@@ -275,10 +285,12 @@ def otp_validation(request):
                 user = authenticate(request, username=validated_user_data['username'], password=validated_user_data['password'])
                 if user is not None:
                     auth_login(request, user)
+                    # Display a success message (SUCCESS)
+                    messages.success(request, 'SUCCESS: Account created successfully. You are now logged in.')
                     return redirect("upload-file")
             else:
-                # Incorrect OTP, redirect to sign_up.html
-                print("Incorrect OTP. Please try again.")
+                # Incorrect OTP, display an error message (WARNING)
+                messages.warning(request, "WARNING: Incorrect OTP. Please try again.")
                 return render(request, "sign_up.html")
 
         elif context == 'forget_password':
@@ -290,8 +302,8 @@ def otp_validation(request):
                 # (e.g., allow the user to reset their password)
                 return render(request, "reset_password.html")
             else:
-                # Incorrect OTP, redirect to forget_password.html
-                messages.error(request, "Incorrect OTP. Please try again.")
+                # Incorrect OTP, display an error message (WARNING)
+                messages.warning(request, "WARNING: Incorrect OTP. Please try again.")
                 return render(request, "otp.html")
 
         elif context == 'reset_password':
@@ -303,13 +315,13 @@ def otp_validation(request):
                 # (e.g., allow the user to reset their password)
                 return render(request, "reset_password.html")
             else:
-                # Incorrect OTP, redirect to forget_password.html
-                messages.error(request, "Incorrect OTP. Please try again.")
+                # Incorrect OTP, display an error message (WARNING)
+                messages.warning(request, "WARNING: Incorrect OTP. Please try again.")
                 return render(request, "sign_up.html")
 
-    # Redirect to sign_up.html if the request is not POST
+    # Redirect to sign_up.html with an informational message (INFO) if the request is not POST
+    messages.info(request, 'INFO: Please enter the OTP to verify your identity.')
     return render(request, "sign_up.html")
-
 
 def sign_up(request):
     if request.method == "POST":
@@ -320,20 +332,26 @@ def sign_up(request):
         getPassword = request.POST.get("password")
         getConfirmPassword = request.POST.get("confirmPassword")
 
-        #calling validation data function
+        # calling validation data function
         validation_result, validation_message = validate_data(
             getFirstName, getLastName, getUserName, getEmail, getPassword, getConfirmPassword
         )
         if not validation_result:
-            # If validation fails, display an error message
-            messages.error(request, validation_message)
-            return render(request, "sign_up.html")
+            # If validation fails, display an error message (WARNING)
+            messages.warning(request, validation_message)
+            # Retain entered data in the form fields
+            return render(request, "sign_up.html", {
+                'firstname': getFirstName,
+                'lastname': getLastName,
+                'username': getUserName,
+                'email': getEmail,
+            })
 
         otp = generate_otp()
         send_otp_email(getEmail, otp)
 
         request.session['otp_context'] = 'sign_up'
-        #Stores the user's data in session
+        # Stores the user's data in session
         request.session['validated_user_data'] = {
             'first_name': getFirstName,
             'last_name': getLastName,
@@ -341,10 +359,17 @@ def sign_up(request):
             'email': getEmail,
             'password': getPassword,
             'otp': otp,
-            }
-        return render(request, "otp.html")
-    return render(request, "sign_up.html")
+        }
 
+        # Display a success message (SUCCESS)
+        messages.success(request, 'SUCCESS: An OTP has been sent to your email. Please enter the OTP to complete the registration.')
+
+        return render(request, "otp.html")
+
+    # Display an informational message (INFO)
+    messages.info(request, 'INFO: Please fill out the registration form.')
+
+    return render(request, "sign_up.html")
 
 def forget_password(request):
     if request.method == "POST":
@@ -353,7 +378,8 @@ def forget_password(request):
         try:
             user = User.objects.get(email=getEmail)
         except User.DoesNotExist:
-            messages.error(request, "Email does not exist. Please Enter a valid email.")
+            # Display an error message (WARNING)
+            messages.warning(request, "WARNING: Email does not exist. Please enter a valid email.")
             return render(request, "sign_in.html")
 
         # Generate and send OTP
@@ -361,13 +387,18 @@ def forget_password(request):
         send_otp_email(getEmail, otp)
 
         request.session['otp_context'] = 'forget_password'
-        print("Session = ", request.session.get('otp_context'))
         request.session['forget_password'] = {
             'email': getEmail,
             'otp': otp,
         }
 
+        # Display a success message (SUCCESS)
+        messages.success(request, 'SUCCESS: An OTP has been sent to your email. Please enter the OTP to reset your password.')
+
         return render(request, "otp.html")
+
+    # Display an informational message (INFO)
+    messages.info(request, 'INFO: Please enter your email to reset your password.')
 
     return render(request, "forget_password.html")
 
@@ -379,9 +410,11 @@ def reset_password(request):
         getPassword = request.POST.get("password")
 
         if not getEmail:
-            messages.error(request, "Invalid or missing email. Please try again.")
+            # Display an error message (WARNING)
+            messages.warning(request, "WARNING: Invalid or missing email. Please try again.")
             return render(request, "reset_password.html")
 
+        # Generate and send OTP
         otp = generate_otp()
         send_otp_email(getEmail, otp)
 
@@ -392,26 +425,40 @@ def reset_password(request):
             'otp': otp,
         }
 
+        # Display a success message (SUCCESS)
+        messages.success(request, 'SUCCESS: An OTP has been sent to your email. Please enter the OTP to confirm your new password.')
+
         return render(request, "otp.html")
 
-    return render(request, "reset_password.html")
+    # Display an informational message (INFO)
+    messages.info(request, 'INFO: Please enter your new password.')
 
+    return render(request, "reset_password.html")
 def upload_file(request):
 
     return render(request, "upload_file.html")
-
 def submit_excel(request):
     if request.method == "POST":
-        excel = request.FILES.get("excelFile" , None)
+        excel = request.FILES.get("excelFile", None)
         file_name = ''
+
         if excel:
-                file_name = str(excel)
-                file_name = default_storage.save('excel/' + file_name, ContentFile(excel.read()))
-                input_excel = file_name
+            file_name = str(excel)
+            file_name = default_storage.save('excel/' + file_name, ContentFile(excel.read()))
+            input_excel = file_name
         else:
             input_excel = ''
-        file_data(username = request.user, excel_file = input_excel).save()
+
+        # Save file_data with associated username and excel_file
+        file_data(username=request.user, excel_file=input_excel).save()
+
+        # Display a success message (SUCCESS)
+        messages.success(request, 'SUCCESS: Excel file submitted successfully.')
+
         return redirect("index")
+
+    # If the method is not POST, redirect with an informational message (INFO)
+    messages.info(request, 'INFO: Please use the upload form to submit an Excel file.')
     return redirect("upload-file")
 
 def show_sign_in(request):
