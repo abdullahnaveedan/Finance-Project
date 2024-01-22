@@ -83,7 +83,7 @@ def index(request):
         data = pd.read_excel(file_path)
         group = get_table_data(file_path, dict_to_map)
     except Exception as e:
-        print("Error processing the file.")
+        messages.warning(request , "Error processing the file.")
     data = pd.read_excel(file_path)
     data = data.rename(columns = dict_to_map)
     cols_drop=['Customer Code','Disbursement Date','Date of Last Payment','Write-Off Date']
@@ -196,12 +196,19 @@ def sign_in(request):
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
-                messages.success(request, 'Login Success.')
                 auth_login(request, user)
                 # Store the user's email in the session
                 request.session['email'] = user.email
-
-                return render(request, "upload_file.html")
+                user_record = file_data.objects.filter(username = request.user).order_by('-id') 
+                
+                if len(user_record) > 0:
+                    latest_record = user_record.first()
+                    file = latest_record.excel_file
+                    myfile = checkFile(file)
+                    if myfile == True:
+                        return redirect("index")
+                    else:
+                        return redirect("upload-file")
             else:
                 messages.warning(request, 'Invalid email or password. Please try again.')
 
@@ -255,7 +262,6 @@ def otp_validation(request):
 
         # Determine the context (signup or forget password)
         context = request.session.get('otp_context')
-        print("context = ", context)
         if context == 'sign_up':
             # Retrieve validated user data from the session
             validated_user_data = request.session.get('validated_user_data', None)
@@ -278,8 +284,8 @@ def otp_validation(request):
                     return redirect("upload-file")
             else:
                 # Incorrect OTP, redirect to sign_up.html
-                print("Incorrect OTP. Please try again.")
-                return render(request, "sign_up.html")
+                messages.warning(request , "Incorrect OTP. Please try again.")
+                return render(request, "otp.html")
 
         elif context == 'forget_password':
             # Retrieve forget password data from the session
@@ -291,7 +297,7 @@ def otp_validation(request):
                 return render(request, "reset_password.html")
             else:
                 # Incorrect OTP, redirect to forget_password.html
-                messages.error(request, "Incorrect OTP. Please try again.")
+                messages.warning(request, "Incorrect OTP. Please try again.")
                 return render(request, "otp.html")
 
         elif context == 'reset_password':
@@ -304,7 +310,7 @@ def otp_validation(request):
                 return render(request, "reset_password.html")
             else:
                 # Incorrect OTP, redirect to forget_password.html
-                messages.error(request, "Incorrect OTP. Please try again.")
+                messages.warning(request, "Incorrect OTP. Please try again.")
                 return render(request, "sign_up.html")
 
     # Redirect to sign_up.html if the request is not POST
@@ -326,7 +332,7 @@ def sign_up(request):
         )
         if not validation_result:
             # If validation fails, display an error message
-            messages.error(request, validation_message)
+            messages.warning(request, validation_message)
             return render(request, "sign_up.html")
 
         otp = generate_otp()
@@ -353,8 +359,8 @@ def forget_password(request):
         try:
             user = User.objects.get(email=getEmail)
         except User.DoesNotExist:
-            messages.error(request, "Email does not exist. Please Enter a valid email.")
-            return render(request, "sign_in.html")
+            messages.warning(request, "Email does not exist. Please Enter a valid email.")
+            return redirect("forget_password")
 
         # Generate and send OTP
         otp = generate_otp()
@@ -400,6 +406,37 @@ def upload_file(request):
 
     return render(request, "upload_file.html")
 
+def checkFile(file):
+    file_path = os.path.join(settings.MEDIA_ROOT, str(file))
+    try:
+        data = pd.read_excel(file_path) 
+        dict_to_map = {
+            'CODIGO_CLIENTE': "Customer Code", 
+            'FECHA_DESEMBOLSO': "Disbursement Date", 
+            'VALOR_DESEMBOLSOS':'Disbursement Amount',
+            'VALOR_CUOTA':'Installment Value', 
+            'DIAS_ATRASO_CAPITAL': 'Days of Capital Delay', 
+            'MESES_EN_ATRASO': 'Months in Arrears', 
+            'SALDO_ACTUAL':'Current Balance',
+            'BALANCE_CAPITAL': 'Capital Balance', 
+            'INTERES': 'Interest', 
+            'MORA': 'Late Payment Interest / Arrears', 
+            'FECHA_ULTIMO_PAGO': 'Date of Last Payment',
+            'MONTO_ULTIMO_PAGO': 'Amount of Last Payment', 
+            'FECHA_CASTIGO': 'Write-Off Date'
+        }
+        spanishFile = set(list(dict_to_map.keys()))
+        englishFile = set(list(dict_to_map.values()))
+        header = set(list(data.columns.tolist()))
+
+        if header == englishFile or header == spanishFile:
+            return True
+        else: 
+            return False
+    except Exception as e:
+        return False
+    return False
+
 def submit_excel(request):
     if request.method == "POST":
         excel = request.FILES.get("excelFile" , None)
@@ -411,7 +448,19 @@ def submit_excel(request):
         else:
             input_excel = ''
         file_data(username = request.user, excel_file = input_excel).save()
-        return redirect("index")
+        data = file_data.objects.filter(username = request.user).order_by('-id')
+        latest_record = data.first()
+        file = latest_record.excel_file
+        myfile = checkFile(file)
+        
+        if myfile == True:
+            # messages.success(request , "Congratulation. Your File is been Processed")
+            return redirect("index")
+        else:
+            messages.warning(request , "Error: The header in your file does not match our requirements.")
+            os.remove(os.path.join(settings.MEDIA_ROOT, str(file)))
+            latest_record.delete()
+            return redirect("upload-file")
     return redirect("upload-file")
 
 def show_sign_in(request):
