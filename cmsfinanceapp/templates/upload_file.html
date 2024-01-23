@@ -116,7 +116,7 @@
 		</div>
 		<form method="POST" enctype="multipart/form-data" action="/submit_excel/">
 			{% csrf_token %}
-			<div class="dropzone">
+			<div class="dropzone mx-3">
 				<img src="http://100dayscss.com/codepen/upload.svg" class="upload-icon" />
 				<input required type="file" class="upload-input" name = "excelFile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
 			</div>
