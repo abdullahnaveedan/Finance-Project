@@ -23,7 +23,7 @@ background: linear-gradient(90deg, rgba(36,62,126,1) 26%, rgba(12,115,148,1) 100
 .sign-up-page .svg svg{
     border :7px solid #fff;
     border-radius: 50%;
-    padding: 0.55rem;
+    padding: 0.56rem;
 }
 .sign-up-page form input{
     border-radius: 3rem;

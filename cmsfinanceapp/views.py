@@ -238,7 +238,7 @@ def index(request):
             # This line chart will display the sequence of capital (RD) over time
             # 13. Analysis of Capital Balance over Time
         data['Year of Last Payment'] = data['Date of last payment'].dt.year
-        capital_balance_over_time = data.groupby('Year of Last Payment')['Capital (RD)'].mean()
+        capital_balance_over_time = data.groupby('Year of Last Payment')['Capital (Pesos)'].mean()
         capitalBalanceIndex = list(capital_balance_over_time.index)
         capitalBalanceValues= list(np.round_(capital_balance_over_time.values))
             # This bar graph will tells us the distribution of no. of transactions made
@@ -318,14 +318,14 @@ def index(request):
 
 def sign_in(request):
     if request.method == "POST":
-            username = request.POST.get("username")
+            email = request.POST.get("email")
             password = request.POST.get("password")
-
-            user = authenticate(request, username=username, password=password)
+            usr = User.objects.get(email = email)
+            
+            user = authenticate(request, username = usr.username, password=password)
 
             if user is not None:
                 auth_login(request, user)
-                # Store the user's email in the session
                 request.session['email'] = user.email
                 user_record = file_data.objects.filter(username = request.user).order_by('-id') 
                 
@@ -535,6 +535,7 @@ def reset_password(request):
 
     return render(request, "reset_password.html")
 
+@login_required(login_url='sign_in')
 def upload_file(request):
 
     return render(request, "upload_file.html")

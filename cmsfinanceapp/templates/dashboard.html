@@ -13,6 +13,7 @@
       integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous"
     />
+    <link rel="shortcut icon" href="{% static 'img/logo.png'%}" type="image/x-icon">
     <script
       src="https://code.jquery.com/jquery-3.7.1.js"
       integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
@@ -23,34 +24,44 @@
   </head>
 
   <body>
-    <nav class="navbar navbar-expand-lg"  style="background-color: black;">  
-      <div class="container-fluid">
-        <a class="navbar-brand text-light" href="#">Finance</a>
-        <button class="navbar-toggler text-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-          <ul class="navbar-nav text-light">
-            <li class="nav-item ">
-              <a class="nav-link active text-light" aria-current="page" href="upload-file">Upload File</a>
-            </li>
-            
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-light text-capitalize" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                {{request.user.username}}
-              </a>
-              <ul class="dropdown-menu">
-                {% comment %} <li><a class="dropdown-item" href="reset_password">Reset Password</a></li> {% endcomment %}
-                <li><a class="dropdown-item text-danger" href="sign-out">Sign Out</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="mx-4 px-4 d-flex">
+      <a class="navbar-brand" href="/">
+          <img src="{% static 'img/logo-t-white.png'%}" width="50" height="50" class="d-inline-block align-top" alt="">
+        </a>
+        <h3 class="mt-3">Templaris</h3>
       </div>
-    </nav>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+          <ul class="navbar-nav" style="margin-right:6rem">
+              <li class="nav-item mx-4">
+                  <a class="nav-link fw-bold text-light" href="upload-file">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+                  </svg></a>
+              </li>
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle text-capitalize fw-bold text-light" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      {{request.user.username}}
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      {% comment %} <a class="dropdown-item" href="#">Action</a> {% endcomment %}
+                      {% comment %} <a class="dropdown-item" href="#">Another action</a> {% endcomment %}
+                      {% comment %} <div class="dropdown-divider"></div> {% endcomment %}
+                      <a class="dropdown-item text-danger" href="sign-out">Logout</a>
+                  </div>
+              </li>
+          </ul>
+      </div>
+  </nav>
+
     <div class="container-fluid">
-      <div class="d-flex main-ctr pt-4">
-        <svg
+      <div class="d-flex main-ctr pt-4 mx-3">
+        {% comment %} <svg
           xmlns="http://www.w3.org/2000/svg"
           width="25"
           height="25"
@@ -62,7 +73,7 @@
             fill-rule="evenodd"
             d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"
           />
-        </svg>
+        </svg> {% endcomment %}
         <h2 style="float: left;">Dashboard</h2>
       </div>
     </div>
@@ -78,33 +89,8 @@
         {% for key,value in dataset_mean.items %}
         <div class="col-lg rounded m-1">
           <div class="Preview">
-            <div class="d-flex pt-2 justify-content-between">
-              <p class="text-start" style="width: 11rem">{{key }}</p>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                width="25"
-                height="25"
-              >
-                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                <g
-                  id="SVGRepo_tracerCarrier"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                ></g>
-                <g id="SVGRepo_iconCarrier">
-                  <path
-                    d="M21 7L13 15L9 11L3 17M21 7H15M21 7V13"
-                    stroke="#001A72"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  ></path>
-                </g>
-              </svg>
-            </div>
-            <p style="overflow: hidden">{{value|floatformat:2}}</p>
+            <p class="text-start pt-2" style="width: 12rem">{{key }}</p>
+            <h4 class="fw-bold" style="overflow: hidden">{{value|floatformat:2|intcomma}}</h4>
           </div>
         </div>
         {% endfor %}
@@ -124,12 +110,62 @@
                 d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"
               />
             </svg>
-            Captial Balance 
+            Capital Balance 
           </p>
           <canvas
             id="myChart"
             style="width: 100%; max-width: 100%; height: 80%"
           ></canvas>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+              var xValues_lineGraph_nested = {{ lineGraph.x|safe }};
+              var yValues_lineGraph_nested = {{ lineGraph.y|safe }};
+          
+              var xValues_line = xValues_lineGraph_nested[0];
+              var yValues_line = yValues_lineGraph_nested[0];
+          
+              new Chart("myChart", {
+                  type: "line",
+                  data: {
+                      labels: xValues_line,
+                      datasets: [{
+                          fill: false,
+                          lineTension: 0,
+                          backgroundColor: "red",
+                          borderColor: "rgba(1, 115, 24, 0.6)",
+                          data: yValues_line
+                      }]
+                  },
+                  options: {
+                      legend: { display: false },
+                      scales: {
+                          yAxes: [{
+                              ticks: {
+                                  min: 6,
+                                  fontColor: 'white' // Change the color of y-axis labels
+                              },
+                              scaleLabel: {
+                                  display: true,
+                                  labelString: 'Capital Balance',
+                                  fontColor: 'white' // Change the color of y-axis label
+                              }
+                          }],
+                          xAxes: [{
+                              ticks: {
+                                  fontColor: 'white' // Change the color of x-axis labels
+                              },
+                              scaleLabel: {
+                                  display: true,
+                                  labelString: 'Years',
+                                  fontColor: 'white' // Change the color of x-axis label
+                              }
+                          }]
+                      }
+                  }
+              });
+          });
+          
+          </script>
         </div>
         <div class="col-lg-4 actual-price p-0 px-1">
           <div class="d-flex flex-wrap">
@@ -166,6 +202,34 @@
               id="doughnutChart"
               style="width: 100%; max-width: 22rem; height: 15rem"
             ></canvas>
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                var xValues_doughnut_nested = {{ proportion_by_loan_size.x|safe }};
+                var yValues_doughnut_nested = {{ proportion_by_loan_size.y|safe }};
+        
+                // Extract the inner lists
+                var xValues_doughnut = xValues_doughnut_nested[0];
+                var yValues_doughnut = yValues_doughnut_nested[0];
+                var barColors = ["#b91d47", "#00aba9", "#2b5797"];
+        
+                new Chart("doughnutChart", {
+                    type: "doughnut",
+                    data: {
+                        labels: xValues_doughnut,
+                        datasets: [{
+                            backgroundColor: barColors,
+                            data: yValues_doughnut
+                        }]
+                    },
+                    options: {
+                        title: {
+                            display: true,
+                            text: "Loan Size Category"
+                        }
+                    }
+                });
+            });
+            </script>
             <br />
           </div>
         </div>
@@ -188,71 +252,124 @@
             {% if request.session.file_type == "Loan" %}
               Loan Performance over Years        
             {% elif request.session.file_type == "Credit" %}
-              
+             Age of Account Holder
             {% endif %}
           </p>
           {% if request.session.file_type == "Loan" %}
               <canvas id="stackedChartID"></canvas>
               <script>
-                var xValues_doubleBar_nested = {{ doublebar.x|safe }};
-                var yValues_doubleBar_nested = {{ doublebar.y|safe }};
-                var zValues_doubleBar_nested = {{ doublebar.z|safe }};
-            
-                var xValues_doubleBar = xValues_doubleBar_nested[0];
-                var yValues_doubleBar = yValues_doubleBar_nested[0];
-                var zValues_doubleBar = zValues_doubleBar_nested[0];
-            
                 document.addEventListener('DOMContentLoaded', function () {
-                var myContext = document.getElementById("stackedChartID").getContext('2d');
-                    var myChart = new Chart(myContext, {
-                      type: 'bar',
+                    var Values_doubleBar_x = {{ age.x|safe }};
+                    var Values_doubleBar_y = {{ age.y|safe }};
+                    var xValues_doubleBar = Values_doubleBar_x[0];
+                    var yValues_doubleBar = Values_doubleBar_y[0];
+                    var ctx2 = document.getElementById('nonstackedChartID').getContext('2d');
+            
+                    var comboChart = new Chart(ctx2, {
+                        type: 'bar', // Set the initial type to bar
+                        data: {
+                            labels: xValues_doubleBar,
+                            datasets: [
+                                {
+                                    label: ' ',
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    borderWidth: 1,
+                                    data: yValues_doubleBar
+                                },
+                                {
+                                    label: ' ',
+                                    type: 'line',
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    borderWidth: 2,
+                                    fill: false,
+                                    data: yValues_doubleBar
+                                }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: 'white' // Change the color of y-axis values
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        color: 'white' // Change the color of x-axis values
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+            
+            {% elif request.session.file_type == "Credit" %}
+            <canvas id="nonstackedChartID"></canvas>
+            
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                  var Values_doubleBar_x = {{ age.x|safe }};
+                  var Values_doubleBar_y = {{ age.y|safe }};
+                  var xValues_doubleBar = Values_doubleBar_x[0];
+                  var yValues_doubleBar = Values_doubleBar_y[0];
+                  var ctx2 = document.getElementById('nonstackedChartID').getContext('2d');
+          
+                  var comboChart = new Chart(ctx2, {
+                      type: 'bar', // Set the initial type to bar
                       data: {
                           labels: xValues_doubleBar,
-                          datasets: [{
-                              label: 'Disbursed',
-                              backgroundColor: "orange",
-                              data: yValues_doubleBar,
-                              stack: 'Stack 0',
-                          }, {
-                              label: 'Write Off',
-                              backgroundColor: "#61bdfa",
-                              data: zValues_doubleBar,
-                              stack: 'Stack 1'
-                          }],
+                          datasets: [
+                              {
+                                  label: ' ',
+                                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                  borderColor: 'rgba(75, 192, 192, 1)',
+                                  borderWidth: 1,
+                                  data: yValues_doubleBar
+                              },
+                              {
+                                  label: ' ',
+                                  type: 'line',
+                                  borderColor: 'rgba(255, 99, 132, 1)',
+                                  borderWidth: 2,
+                                  fill: false,
+                                  data: yValues_doubleBar
+                              }
+                          ]
                       },
                       options: {
-                          plugins: {
-                              title: {
-                                  display: true,
-                                  text: 'Chart.js Bar Chart - Stacked'
-                              },
-                          },
-                          interaction: {
-                              intersect: false,
-                          },
                           scales: {
-                            xAxes: {
-                                  stacked: true,
+                              y: {
+                                  beginAtZero: true,
+                                  ticks: {
+                                      fontColor: 'white'
+                                  },
                                   title: {
                                       display: true,
-                                      text: 'X-Axis Label'
+                                      text: 'Y-Axis Name',
+                                      color: 'white' // Change the color of y-axis label
                                   }
                               },
-                              yAxes: {
-                                  stacked: true,
+                              x: {
+                                  ticks: {
+                                      fontColor: 'white' // Change the color of x-axis values
+                                  },
                                   title: {
                                       display: true,
-                                      text: 'Y-Axis Label'
+                                      text: 'X-Axis Name',
+                                      color: 'white' // Change the color of x-axis label
                                   }
                               }
-                          },
-                          responsive: true
+                          }
                       }
                   });
               });
-              </script>
-            {% elif request.session.file_type == "Credit" %}
-            <canvas id="nonstackedChartID"></canvas>
+          </script>
+          
+
+          
             {% endif %}
 
         </div>
@@ -278,6 +395,66 @@
             {% endif %}
           </p>
           <canvas id="get_time_off"></canvas>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+              var xValues_doubleBar = {{ loan_age_distribution.x|safe }};
+              var yValues_doubleBar = {{ loan_age_distribution.y|safe }};
+              
+              if ("{{ request.session.file_type }}" == "Credit") {
+                xValues_doubleBar = xValues_doubleBar[0];
+                yValues_doubleBar = yValues_doubleBar[0];
+              }
+              
+              var ctx = document.getElementById('get_time_off').getContext('2d');
+              
+              var comboChart = new Chart(ctx, {
+                type: 'bar', // Set the initial type to bar
+                data: {
+                  labels: xValues_doubleBar,
+                  datasets: [
+                    {
+                      label: ' ',
+                      backgroundColor: 'rgba(255, 99, 132, 0.31)',
+                      borderColor: 'rgba(255, 99, 132, 1)',
+                      borderWidth: 1,
+                      data: yValues_doubleBar // Dataset
+                    },
+                    {
+                      label: ' ',
+                      type: 'line',
+                      borderColor: 'rgba(255, 99, 132, 1)',
+                      borderWidth: 2,
+                      fill: false,
+                      data: yValues_doubleBar // Dataset
+                    }
+                  ]
+                },
+                options: {
+                  scales: {
+                    x: {
+                      type: 'category', // Specify the scale type for x-axis as category
+                      labels: xValues_doubleBar, // Assign labels for x-axis
+                      beginAtZero: true,
+                      ticks: {
+                        color: 'white' // Change the color of x-axis labels
+                      },
+                    },
+                    y: {
+                      beginAtZero: true,
+                      ticks: {
+                        color: 'white' // Change the color of y-axis labels
+                      }
+                    }
+                  },
+                  plugins: {
+                    legend: {
+                      display: false
+                    }
+                  }
+                }
+              });
+            });
+          </script>        
         </div>
 
         <div class="col-md-6 rounded mt-2">
@@ -305,6 +482,49 @@
             id="months_distribution"
             style="width: 100%; max-width: 700px"
           ></canvas>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+              var xValues_doubleBar = {{ months_in_arrears_distribution.x|safe }};
+              var yValues_doubleBar = {{ months_in_arrears_distribution.y|safe }};
+              
+              if("{{ request.session.file_type }}" == "Credit"){
+                xValues_doubleBar = xValues_doubleBar[0]
+                yValues_doubleBar = yValues_doubleBar[0]
+              }
+        
+              var ctx2 = document.getElementById('months_distribution').getContext('2d');
+              var comboChart = new Chart(ctx2, {
+                type: 'bar', // Set the initial type to bar
+                data: {
+                    labels: xValues_doubleBar,
+                    datasets: [
+                        {
+                            label: ' ',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            data: yValues_doubleBar
+                        },
+                        {
+                            label: ' ',
+                            type: 'line',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            fill: false,
+                            data: yValues_doubleBar
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+          });
+          </script>
         </div>
         <div class="col rounded mt-2">
           <p class="pt-2 text-start">
@@ -329,6 +549,52 @@
             
           </p>
           <canvas id="write_off" style="width: 100%; max-width: 700px"></canvas>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+              var xValues_doubleBar = {{ time_to_write_off.x|safe }};
+              var yValues_doubleBar = {{ time_to_write_off.y|safe }};
+              if("{{ request.session.file_type }}" == "Credit"){
+                xValues_doubleBar = xValues_doubleBar[0]
+                yValues_doubleBar = yValues_doubleBar[0]
+              }
+              var ctx = document.getElementById('write_off').getContext('2d');
+              var comboChart = new Chart(ctx, {
+                  type: 'bar', // Set the initial type to bar
+                  data: {
+                      labels: xValues_doubleBar,
+                      datasets: [
+                          {
+                              label: ' ',
+                              backgroundColor: 'rgba(101, 117, 240,0.2)',
+                              borderColor: 'rgba(101, 117, 240, 1)',
+                              borderWidth: 1,
+                              data: yValues_doubleBar // Dataset
+                          },
+                          {
+                              label: ' ',
+                              type: 'line',
+                              borderColor: 'rgba(4, 130, 25, 1)',
+                              borderWidth: 2,
+                              fill: false,
+                              data: yValues_doubleBar // Dataset
+                          }
+                      ]
+                  },
+                  options: {
+                      scales: {
+                          x: {
+                              type: 'category', // Specify the scale type for x-axis as category
+                              labels: 'xValues_doubleBar', // Assign labels for x-axis
+                              beginAtZero: true
+                          },
+                          y: {
+                              beginAtZero: true
+                          }
+                      }
+                  }
+              });
+            }); 
+          </script>
         </div>
 
         <div class="col-12 rounded mt-3" style="overflow: scroll">
@@ -356,9 +622,9 @@
                     Yearly Sum Balance RD
                     {% endif %}
                     </th>
-                  <th scope="col">Difference</th>
-                  <th scope="col">Percentage Difference</th>
-                  <th scope="col">Commulative Percentage Difference</th>
+                  <th scope="col">Paid Ammount</th>
+                  <th scope="col">Paid Ammount Percentage</th>
+                  {% comment %} <th scope="col">Commulative Percentage Difference</th> {% endcomment %}
                   
               </tr>
             </thead>
@@ -367,11 +633,11 @@
               <tr>
                   <th scope="row" class="table-dark">{{ forloop.counter }}</th>
                   <td>{{ row.0|floatformat:0 }}</td>
-                  <td>${{ row.1|floatformat:2|intcomma }}</td>
-                  <td>${{ row.2|floatformat:2|intcomma }}</td>
-                  <td>${{ row.3|floatformat:2|intcomma }}</td>
+                  <td>$ {{ row.1|floatformat:2|intcomma }}</td>
+                  <td>$ {{ row.2|floatformat:2|intcomma }}</td>
+                  <td>$ {{ row.3|floatformat:2|intcomma }}</td>
                   <td>{{ row.4|floatformat:2 }}%</td>
-                  <td>{{ row.5|floatformat:2 }}%</td>
+                  {% comment %} <td>{{ row.5|floatformat:2 }}%</td> {% endcomment %}
               </tr>
           {% endfor %}
             </tbody>
@@ -394,185 +660,18 @@
 
       {% comment %} loan_age_distribution Graph Line bar Graph  2nd graph{% endcomment %}
 
-       document.addEventListener('DOMContentLoaded', function () {
-        var Values_doubleBar_x = {{ loan_age_distribution.x|safe }};
-        var Values_doubleBar_y = {{ loan_age_distribution.y|safe }};
-        
-        var xValues_doubleBar = Values_doubleBar_x[0];
-        var yValues_doubleBar = Values_doubleBar_y[0];
-
-        var ctx = document.getElementById('get_time_off').getContext('2d');
-        var comboChart = new Chart(ctx, {
-            type: 'bar', // Set the initial type to bar
-            data: {
-                labels: xValues_doubleBar,
-                datasets: [
-                    {
-                        label: ' ',
-                        backgroundColor: 'rgba(255, 99, 132, 0.31)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1,
-                        data: yValues_doubleBar // Dataset
-                    },
-                    {
-                        label: ' ',
-                        type: 'line',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 2,
-                        fill: false,
-                        data: yValues_doubleBar // Dataset
-                    }
-                ]
-            },
-            options: {
-                scales: {
-                    x: {
-                        type: 'category', // Specify the scale type for x-axis as category
-                        labels: 'xValues_doubleBar', // Assign labels for x-axis
-                        beginAtZero: true
-                    },
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }); 
+     
 
      {% comment %} proportion_by_loan_size doughnut {% endcomment %}
 
 
-      document.addEventListener('DOMContentLoaded', function () {
-        var xValues_doughnut_nested = {{ proportion_by_loan_size.x|safe }};
-        var yValues_doughnut_nested = {{ proportion_by_loan_size.y|safe }};
+     
 
-        // Extract the inner lists
-        var xValues_doughnut = xValues_doughnut_nested[0];
-        var yValues_doughnut = yValues_doughnut_nested[0];
-        var barColors = ["#b91d47", "#00aba9", "#2b5797"];
-
-        new Chart("doughnutChart", {
-            type: "doughnut",
-            data: {
-                labels: xValues_doughnut,
-                datasets: [{
-                    backgroundColor: barColors,
-                    data: yValues_doughnut
-                }]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: "Loan Size Category"
-                }
-            }
-        });
-    });
-    document.addEventListener('DOMContentLoaded', function () {
-      var Values_doubleBar_x = {{ age.x|safe }};
-      var Values_doubleBar_y = {{ age.y|safe }};
-      var xValues_doubleBar = Values_doubleBar_x[0];
-      var yValues_doubleBar = Values_doubleBar_y[0];
-      var ctx2 = document.getElementById('nonstackedChartID').getContext('2d');
-      var comboChart = new Chart(ctx2, {
-        type: 'bar', // Set the initial type to bar
-        data: {
-            labels: xValues_doubleBar,
-            datasets: [
-                {
-                    label: ' ',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1,
-                    data: yValues_doubleBar
-                },
-                {
-                    label: ' ',
-                    type: 'line',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 2,
-                    fill: false,
-                    data: yValues_doubleBar
-                }
-            ]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-  });
+    
     {% comment %} Line bar graph 3rd Graph or 2nd last } {% endcomment %}
-    document.addEventListener('DOMContentLoaded', function () {
-      var Values_doubleBar_x = {{ months_in_arrears_distribution.x|safe }};
-      var Values_doubleBar_y = {{ months_in_arrears_distribution.y|safe }};
-      
-      var xValues_doubleBar = Values_doubleBar_x[0]
-      var yValues_doubleBar = Values_doubleBar_y[0]
-
-      var ctx2 = document.getElementById('months_distribution').getContext('2d');
-      var comboChart = new Chart(ctx2, {
-        type: 'bar', // Set the initial type to bar
-        data: {
-            labels: xValues_doubleBar,
-            datasets: [
-                {
-                    label: ' ',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1,
-                    data: yValues_doubleBar
-                },
-                {
-                    label: ' ',
-                    type: 'line',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 2,
-                    fill: false,
-                    data: yValues_doubleBar
-                }
-            ]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-  });
+   
   {% comment %} Line Graph  {% endcomment %}
-     document.addEventListener('DOMContentLoaded', function () {
-      var xValues_lineGraph_nested = {{ lineGraph.x|safe }};
-      var yValues_lineGraph_nested = {{ lineGraph.y|safe }};
-
-      var xValues_line = xValues_lineGraph_nested[0];
-      var yValues_line = yValues_lineGraph_nested[0];
-
-      new Chart("myChart", {
-          type: "line",
-          data: {
-              labels: xValues_line,
-              datasets: [{
-                  fill: false,
-                  lineTension: 0,
-                  backgroundColor: "red",
-                  borderColor: "rgba(1, 115, 24,0.6)",
-                  data: yValues_line
-              }]
-          },
-          options: {
-              legend: { display: false },
-              scales: {
-                  yAxes: [{ ticks: { min: 6 } }],
-              }
-          }
-    });
-  }); 
+   
 
   {% comment %} Stack bar {% endcomment %}
 
@@ -580,48 +679,7 @@
 
 {% comment %} Line bar graph Last Graph {% endcomment %}
 
-document.addEventListener('DOMContentLoaded', function () {
-  var Values_doubleBar_x = {{ time_to_write_off.x|safe }};
-  var Values_doubleBar_y = {{ time_to_write_off.y|safe }};
-  var xValues_doubleBar = Values_doubleBar_x[0]
-  var yValues_doubleBar = Values_doubleBar_y[0]  
-  var ctx = document.getElementById('write_off').getContext('2d');
-  var comboChart = new Chart(ctx, {
-      type: 'bar', // Set the initial type to bar
-      data: {
-          labels: xValues_doubleBar,
-          datasets: [
-              {
-                  label: ' ',
-                  backgroundColor: 'rgba(101, 117, 240,0.2)',
-                  borderColor: 'rgba(101, 117, 240, 1)',
-                  borderWidth: 1,
-                  data: yValues_doubleBar // Dataset
-              },
-              {
-                  label: ' ',
-                  type: 'line',
-                  borderColor: 'rgba(4, 130, 25, 1)',
-                  borderWidth: 2,
-                  fill: false,
-                  data: yValues_doubleBar // Dataset
-              }
-          ]
-      },
-      options: {
-          scales: {
-              x: {
-                  type: 'category', // Specify the scale type for x-axis as category
-                  labels: 'xValues_doubleBar', // Assign labels for x-axis
-                  beginAtZero: true
-              },
-              y: {
-                  beginAtZero: true
-              }
-          }
-      }
-  });
-}); 
+
 
     </script>
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
@@ -633,8 +691,9 @@ document.addEventListener('DOMContentLoaded', function () {
       integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
       crossorigin="anonymous"
     ></script>
-    
-
+    {% comment %} <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script> {% endcomment %}
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="{%static 'js/charts.js'%}"></script>
   </body>
 </html>
