@@ -341,27 +341,25 @@
                       },
                       options: {
                           scales: {
-                              y: {
+                              yAxes: [{
                                   beginAtZero: true,
                                   ticks: {
                                       fontColor: 'white'
                                   },
                                   title: {
                                       display: true,
-                                      text: 'Y-Axis Name',
                                       color: 'white' // Change the color of y-axis label
                                   }
-                              },
-                              x: {
+                              }],
+                              xAxes: [{
                                   ticks: {
                                       fontColor: 'white' // Change the color of x-axis values
                                   },
                                   title: {
                                       display: true,
-                                      text: 'X-Axis Name',
                                       color: 'white' // Change the color of x-axis label
                                   }
-                              }
+                              }]
                           }
                       }
                   });
@@ -431,27 +429,27 @@
                 },
                 options: {
                   scales: {
-                    x: {
-                      type: 'category', // Specify the scale type for x-axis as category
-                      labels: xValues_doubleBar, // Assign labels for x-axis
-                      beginAtZero: true,
-                      ticks: {
-                        color: 'white' // Change the color of x-axis labels
-                      },
-                    },
-                    y: {
-                      beginAtZero: true,
-                      ticks: {
-                        color: 'white' // Change the color of y-axis labels
-                      }
-                    }
-                  },
-                  plugins: {
-                    legend: {
-                      display: false
-                    }
+                      yAxes: [{
+                          beginAtZero: true,
+                          ticks: {
+                              fontColor: 'white'
+                          },
+                          title: {
+                              display: true,
+                              color: 'white' // Change the color of y-axis label
+                          }
+                      }],
+                      xAxes: [{
+                          ticks: {
+                              fontColor: 'white' // Change the color of x-axis values
+                          },
+                          title: {
+                              display: true,
+                              color: 'white' // Change the color of x-axis label
+                          }
+                      }]
                   }
-                }
+              }
               });
             });
           </script>        
@@ -516,12 +514,28 @@
                     ]
                 },
                 options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
+                  scales: {
+                      yAxes: [{
+                          beginAtZero: true,
+                          ticks: {
+                              fontColor: 'white'
+                          },
+                          title: {
+                              display: true,
+                              color: 'white' // Change the color of y-axis label
+                          }
+                      }],
+                      xAxes: [{
+                          ticks: {
+                              fontColor: 'white' // Change the color of x-axis values
+                          },
+                          title: {
+                              display: true,
+                              color: 'white' // Change the color of x-axis label
+                          }
+                      }]
+                  }
+              }
             });
           });
           </script>
@@ -581,17 +595,28 @@
                       ]
                   },
                   options: {
-                      scales: {
-                          x: {
-                              type: 'category', // Specify the scale type for x-axis as category
-                              labels: 'xValues_doubleBar', // Assign labels for x-axis
-                              beginAtZero: true
-                          },
-                          y: {
-                              beginAtZero: true
-                          }
-                      }
-                  }
+                    scales: {
+                        yAxes: [{
+                            beginAtZero: true,
+                            ticks: {
+                                fontColor: 'white'
+                            },
+                            title: {
+                                display: true,
+                                color: 'white' // Change the color of y-axis label
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                fontColor: 'white' // Change the color of x-axis values
+                            },
+                            title: {
+                                display: true,
+                                color: 'white' // Change the color of x-axis label
+                            }
+                        }]
+                    }
+                }
               });
             }); 
           </script>
@@ -602,8 +627,9 @@
             {% if request.session.file_type == "Loan" %}
             Loan Performance over Years
           {% elif request.session.file_type == "Credit" %}
-            Age Distribution of Account Holder
+            Table
           {% endif %}</p>
+
           <table class="table table-striped table-hover">
             <thead class="table-dark">
               <tr>
