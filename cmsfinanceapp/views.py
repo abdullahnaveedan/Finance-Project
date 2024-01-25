@@ -18,7 +18,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import make_password
-
+import math
 # from django_pandas.io import read_frame
 
 
@@ -205,6 +205,14 @@ def index(request):
         # Read and send excel file
         data['Recovery rate'] = (data['Capital Balance'] + data['Interest']) / data['Disbursement Amount'] * 100
         recovery_rate = data['Recovery rate'].mean() 
+        print(recovery_rate)
+        if recovery_rate > 100:
+            print("G")
+            recovery_rate = math.floor(recovery_rate)
+            print(recovery_rate)
+        else:
+            print("S")
+            recovery_rate = round(number, 1)
 
         recovery_rate_bins = pd.cut(data['Recovery rate'], bins=bins , labels=labels)
         recovery = data.groupby(recovery_rate_bins).size()
