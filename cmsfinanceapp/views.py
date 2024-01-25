@@ -17,6 +17,8 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.contrib.auth.hashers import make_password
+
 # from django_pandas.io import read_frame
 
 
@@ -159,14 +161,15 @@ def index(request):
         capital_balance_over_time = data.groupby('Year of Last Payment')['Capital Balance'].mean()
         capitalBalanceIndex = list(capital_balance_over_time.index)
         capitalBalanceValues= list(np.round_(capital_balance_over_time.values))
-    
-    
+
+        bins=[0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500,np.inf]
+        labels= ['0-50', '50-100', '100-150', '150-200', '200-250', '250-300', '300-350', '350-400', '400-450', '450-500', '>500']
+
+
+        # Create bins using pd.cut() and count occurrences in each bin using groupby
+        
         # Distribution of Months in Arrears
         # This data is for plot of Distribution of Months in Arrears
-        months_in_arrears_distribution = dict(OrderedDict(sorted(data['Months in Arrears'].value_counts().to_dict().items())))
-    
-        monthInArrearsDistribution_x = list(months_in_arrears_distribution.keys())
-        monthInArrearsDistribution_y = list(months_in_arrears_distribution.values())
     
         # Loan Age (Time since disbursement to the current date or write-off date)
         # This data is for plot of Distribution of Loan Age
@@ -202,6 +205,11 @@ def index(request):
         # Read and send excel file
         data['Recovery rate'] = (data['Capital Balance'] + data['Interest']) / data['Disbursement Amount'] * 100
         recovery_rate = data['Recovery rate'].mean() 
+
+        recovery_rate_bins = pd.cut(data['Recovery rate'], bins=bins , labels=labels)
+        recovery = data.groupby(recovery_rate_bins).size()
+        monthInArrearsDistribution_x = recovery.index.tolist()
+        monthInArrearsDistribution_y = recovery.values.tolist()
         context = {
                  'dataset_mean' : toMean, # Done Speedometer
                  'dataset_length':dataset_len, # Done mini-1
@@ -350,6 +358,8 @@ def sign_in(request):
 def sign_out(request):
     if request.user.is_authenticated:
         auth_logout(request)
+        request.session.clear()
+
     return redirect("sign_in")
 
 
@@ -377,7 +387,7 @@ def validate_data(first_name, last_name, username, email, password, confirm_pass
             any(c.isdigit() for c in password) and
             any(c in "!@#$%^&*()-_=+[]{}|;:'\",.<>/?`~" for c in password) and
             len(password) >= 8):
-        return False, "Password must contain at least one alphabet character, one digit, one special character, and be at least 8 characters long."
+        return False, "Enter password containing numeric digits, alphabets and special chracters."
 
     return True, "Validation successful."
 
@@ -395,6 +405,17 @@ def otp_validation(request):
 
         # Determine the context (signup or forget password)
         context = request.session.get('otp_context')
+        print(context)
+        if context == 'forget_password':
+            forget_password_data = request.session.get('forget_password')
+
+            if forget_password_data and entered_otp == forget_password_data['otp']:
+                return redirect("reset_password")
+            else:
+                messages.warning(request, "Incorrect OTP. Please try again.")
+                return render(request, "otp.html")
+
+
         if context == 'sign_up':
             # Retrieve validated user data from the session
             validated_user_data = request.session.get('validated_user_data', None)
@@ -420,31 +441,7 @@ def otp_validation(request):
                 messages.warning(request , "Incorrect OTP. Please try again.")
                 return render(request, "otp.html")
 
-        elif context == 'forget_password':
-            # Retrieve forget password data from the session
-            forget_password_data = request.session.get('forget_password')
 
-            if forget_password_data and entered_otp == forget_password_data['otp']:
-                # OTP validation successful, proceed with forget password logic
-                # (e.g., allow the user to reset their password)
-                return render(request, "reset_password.html")
-            else:
-                # Incorrect OTP, redirect to forget_password.html
-                messages.warning(request, "Incorrect OTP. Please try again.")
-                return render(request, "otp.html")
-
-        elif context == 'reset_password':
-            # Retrieve forget password data from the session
-            reset_password_data = request.session.get('reset_password')
-
-            if reset_password_data and entered_otp == reset_password_data['otp']:
-                # OTP validation successful, proceed with reset password logic
-                # (e.g., allow the user to reset their password)
-                return render(request, "reset_password.html")
-            else:
-                # Incorrect OTP, redirect to forget_password.html
-                messages.warning(request, "Incorrect OTP. Please try again.")
-                return render(request, "sign_up.html")
 
     # Redirect to sign_up.html if the request is not POST
     return render(request, "sign_up.html")
@@ -488,14 +485,13 @@ def sign_up(request):
 def forget_password(request):
     if request.method == "POST":
         getEmail = request.POST.get("email")
-        # Check if the email exists in the database
+
         try:
             user = User.objects.get(email=getEmail)
         except User.DoesNotExist:
-            messages.warning(request, "Email does not exist. Please Enter a valid email.")
+            messages.warning(request, "Email does not exist. Please enter a valid email.")
             return redirect("forget_password")
 
-        # Generate and send OTP
         otp = generate_otp()
         send_otp_email(getEmail, otp)
 
@@ -513,27 +509,38 @@ def forget_password(request):
 
 def reset_password(request):
     if request.method == "POST":
-        # Retrieve email from the session
-        getEmail = request.session.get('email')
-        getPassword = request.POST.get("password")
+        get_email = request.session.get('forget_password')['email']
+        new_password = request.POST.get("newPassword")
+        confirm_password = request.POST.get("ConfirmPassword")
 
-        if not getEmail:
-            messages.error(request, "Invalid or missing email. Please try again.")
+        print("new_pssword = ", new_password)
+        
+        if new_password != confirm_password:
+            messages.warning(request, '''Password doesn't match.''')
             return render(request, "reset_password.html")
+        if not (any(c.isalpha() for c in new_password) and
+            any(c.isdigit() for c in new_password) and
+            any(c in "!@#$%^&*()-_=+[]{}|;:'\",.<>/?`~" for c in new_password) and
+            len(new_password) >= 8):
+                messages.warning(request, '''"Enter password containing numeric digits, alphabets and special chracters."''')
+                return render(request, "reset_password.html")
+        
+        else:
+            try:
+                user = User.objects.get(email=get_email)
+                user.set_password(new_password)
+                user.save()
+                print("Password saved successfully")
+                messages.success(request, "Your Password update successfully.")
+            except User.DoesNotExist:
+                messages.error(request, "User with this email does not exist.")
+                return render(request, "forget_password.html")
 
-        otp = generate_otp()
-        send_otp_email(getEmail, otp)
-
-        request.session['otp_context'] = 'reset_password'
-        request.session['reset_password'] = {
-            'email': getEmail,
-            'password': getPassword,
-            'otp': otp,
-        }
-
-        return render(request, "otp.html")
+        request.session.clear()
+        return redirect("sign_in")
 
     return render(request, "reset_password.html")
+
 
 @login_required(login_url='sign_in')
 def upload_file(request):
