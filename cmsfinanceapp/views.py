@@ -67,28 +67,26 @@ def get_table_data(file_path, dict_to_map):
     group = grouped_data_with_values.values.tolist()
     return group
 
-def credit_stats(filepath,type):
-    try:
-        data = pd.read_excel(filepath)
-    except Exception as e:
-        return f"Error processings the file: {str(e)}"
+def credit_stats(data):
+    # try:
+    #     data = pd.read_excel(filepath)
+    # except Exception as e:
+    #     return f"Error processings the file: {str(e)}"
+
+    data['Year'] = data['Issue Date'].dt.year  # Extract year from Issue Date
+    # Group by the year of Issue Date and calculate yearly sums
+    yearly_data = data.groupby('Year').agg(
+        Yearly_Sum_Capital_RD=('Capital (RD)', 'sum'),
+        Yearly_Sum_Balance_RD=('Balance (RD)', 'sum')
+    ).reset_index()
+    # Calculate the difference and percentage difference
+    yearly_data['Difference'] = yearly_data['Yearly_Sum_Balance_RD'] - yearly_data['Yearly_Sum_Capital_RD']
+    yearly_data['Percentage Difference'] = (yearly_data['Difference'] / yearly_data['Yearly_Sum_Capital_RD']) * 100
+    # Calculate cumulative percentage difference
+    yearly_data['Cumulative Percentage Difference'] = yearly_data['Percentage Difference'].cumsum()
+    group = yearly_data.values.tolist()
+    return group
     
-    if type == "Credit":
-        data['Issue Date'] = pd.to_datetime(data['Issue Date'], errors='coerce')
-        data['Year'] = data['Issue Date'].dt.year  # Extract year from Issue Date
-        # Group by the year of Issue Date and calculate yearly sums
-        yearly_data = data.groupby('Year').agg(
-            Yearly_Sum_Capital_RD=('Capital (RD)', 'sum'),
-            Yearly_Sum_Balance_RD=('Balance (RD)', 'sum')
-        ).reset_index()
-        # Calculate the difference and percentage difference
-        yearly_data['Difference'] = yearly_data['Yearly_Sum_Balance_RD'] - yearly_data['Yearly_Sum_Capital_RD']
-        yearly_data['Percentage Difference'] = (yearly_data['Difference'] / yearly_data['Yearly_Sum_Capital_RD']) * 100
-        # Calculate cumulative percentage difference
-        yearly_data['Cumulative Percentage Difference'] = yearly_data['Percentage Difference'].cumsum()
-        group = yearly_data.values.tolist()
-        return group
-    return None
 # Create your views here.
 @login_required(login_url='sign_in')
 def index(request):
@@ -97,8 +95,6 @@ def index(request):
     file = latest_record.excel_file
     file_path = os.path.join(settings.MEDIA_ROOT, str(file))
     file_type = request.session.get('file_type')
-    print("file_type : ", file_type)
-    groupofcredit = credit_stats(file_path, file_type)
     group = ''
     try:
         data = pd.read_excel(file_path)
@@ -233,19 +229,55 @@ def index(request):
                 }
     
     elif file_type == "Credit":
-        
-        cols_drop = ['Product Delinquency', 'Issue Date', 'Expiry Date', 'Next Due Date', 'Capital (US)', 'Minimum Payment (US)',  'Balance (US)', 'Date of last payment',
-                    'Late Status', 'NO', 'CasoID', 'Gender', 'Date of Birth', 'Balance',
-                    'Amount Paid', 'No. of transactions', 'Number of Vehicles',
+        dict_to_map = {
+            "MORA_PRODUCTO": "Product Delinquency",
+            "FECHA_EMISION": "Issue Date",
+            "FECHA_VECIMIENTO": "Expiry Date",
+            "FECHA_PROX_VENC": "Next Due Date",
+            "CAPITAL_RD": "Capital (RD)",
+            "CAPITAL_US": "Capital (US)",
+            "PAGO_MINIMO_RD": "Minimum Payment (RD)",
+            "PAGO_MINIMO_US": "Minimum Payment (US)",
+            "BALANCE_RD": "Balance (RD)",
+            "BALANCE_US": "Balance (US)",
+            "CAPITAL_EN_PESOS": "Capital (Pesos)",
+            "FECHA_ULT_PAGO": "Date of last payment",
+            "MONTO_ULT_PAGO": "Amount of last payment",
+            "RANGO MORA": "Late Status",
+            "NO": "NO",
+            "CasoID": "CasoID",
+            "sexo": "Gender",
+            "fecha_nacimiento": "Date of Birth",
+            "Balance": "Balance",
+            "Monto pagado": "Amount Paid",
+            "Cantidad de Gestiones": "No. of transactions",
+            "Cant. Vehiculos": "Number of Vehicles",
+            "Posible bien": "Possible Asset",
+            "Telefono confirmado1": "Confirmed Phone 1",
+            "Telefono confirmado2": "Confirmed Phone 2",
+            "Embargos": "Seizures"
+        }
+        data = data.rename(columns = dict_to_map)
+        cols_drop = ['Capital (US)', 'Minimum Payment (US)',  'Balance (US)', 
+                    'Late Status', 'NO', 'Gender', 'Balance',
+                    'Amount Paid', 'Number of Vehicles',
                     'Possible Asset', 'Confirmed Phone 1', 'Confirmed Phone 2', 'Seizures']
+        data['Issue Date'] = pd.to_datetime(data['Issue Date'],  format='%Y%m%d')
+        data['Expiry Date'] = pd.to_datetime(data['Expiry Date'],  format='%Y%m')
+        data['Next Due Date'] = pd.to_datetime(data['Next Due Date'],  format='%Y%m%d')
+        # data['Date of last payment'] = pd.to_datetime(data['Date of last payment'],  format='%Y%m%d')
+        groupofcredit = credit_stats(data)
+        data = data.drop(columns=cols_drop)
 
-        filtered_data = data.drop(columns=cols_drop)
+        filtered_data= data[['Capital (Pesos)','Amount of last payment','Balance (RD)','Minimum Payment (RD)','Capital (RD)']]
         mean = filtered_data.mean()
         toMean = mean.to_dict()
             #length of dataset 
         dataset_length = len(data)
             # No. of unique customers 
         unique_customers = data['CasoID'].nunique()
+        
+        
             # Ths bar chart visualize the frequency distribution of Product delinquency codes
             # Analyzing the 'Product Delinquency' column for unique values and their frequencies
         product_delinquency_insights =  dict(OrderedDict(sorted(data['Product Delinquency'].value_counts().to_dict().items())))
@@ -274,7 +306,7 @@ def index(request):
           # The graph visualize the customers who paid before or after the due date 
           # Payment Timeliness (in days)
         data['Payment Timeliness (Months)'] = (data['Next Due Date'] - data['Date of last payment']).dt.days / 30.44
-        data = data.dropna(subset=['Payment Timeliness (Months)']) #for dropping NaN values
+        # data = data.dropna(subset=['Payment Timeliness (Months)']) #for dropping NaN values
         # Create a new column for grouping by defining custom ranges
         bins = [0,6, 12, 18,24,32, 38, 60]  # Customize the bins as per your requirements
         labels = ['0-6 months', '6-12 months', '12-18 months', '18-24 months', '24-32 months','32-38 months','38-60 months']
@@ -285,15 +317,18 @@ def index(request):
         payment_timeliness_x = list(payment_groups.keys())
         payment_timeliness_y = list(payment_groups.values())
 
-        # print(payment_timeliness_y)
+        print(data['Payment Timeliness (Months)'])
+        print(payment_timeliness_y)
+
             # This barchart displays the distribution of account holder's age
             # Current date for age calculation
         current_date = datetime.today()
         # 12. Age of Account Holder
         
         # Convert 'Date of Birth' to datetime
+       
         data['Date of Birth'] = pd.to_datetime(data['Date of Birth'], errors='coerce')
-
+        data = data.dropna(subset= ['Date of Birth'])
         # Calculate age and convert to integers
         current_date = pd.to_datetime('now' , utc = None)
         data['Age of Account Holder'] = ((current_date - data['Date of Birth']).dt.days / 365.25).astype(int)
@@ -336,8 +371,12 @@ def sign_in(request):
     if request.method == "POST":
             email = request.POST.get("email")
             password = request.POST.get("password")
-            usr = User.objects.get(email = email)
-            
+            try:
+                User.objects.get(email=email)
+            except User.DoesNotExist:
+                messages.warning(request , "Email doesn't exist.")
+                return redirect("sign_in")
+            usr = User.objects.get(email=email)
             user = authenticate(request, username = usr.username, password=password)
 
             if user is not None:
@@ -583,7 +622,7 @@ def checkFile(file):
             "CAPITAL_RD": "Capital (RD)",
             "CAPITAL_US": "Capital (US)",
             "PAGO_MINIMO_RD": "Minimum Payment (RD)",
-            "PAGO_MINIMO_Us": "Minimum Payment (US)",
+            "PAGO_MINIMO_US": "Minimum Payment (US)",
             "BALANCE_RD": "Balance (RD)",
             "BALANCE_US": "Balance (US)",
             "CAPITAL_EN_PESOS": "Capital (Pesos)",
@@ -592,7 +631,7 @@ def checkFile(file):
             "RANGO MORA": "Late Status",
             "NO": "NO",
             "CasoID": "CasoID",
-            "Sexo": "Gender",
+            "sexo": "Gender",
             "fecha_nacimiento": "Date of Birth",
             "Balance": "Balance",
             "Monto pagado": "Amount Paid",
