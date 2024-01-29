@@ -46,7 +46,7 @@
                         </button>
                     </div>
                     
-                    <p class="pt-2 ">Don't receive the OTP? <a href="#" onclick="countertime()" class="text-light text-decoration-none" style="font-weight:600;">RESEND</a></p>
+                    <p class="pt-2 ">Don't receive the OTP? <button type="button" onclick="countertime()" id = "resendButton"  class="btn border-none text-light" disabled style="font-weight:600;">RESEND</button></p>
                 </form>
             </div>
 
@@ -69,6 +69,7 @@
                 clearInterval(intervalId);
                 document.getElementById('countdown').innerText = '00:00s';
                 console.log(timeInSeconds);
+                document.getElementById('resendButton').removeAttribute('disabled');
                 // You can also disable the form or perform other actions here
             }
         }
@@ -78,7 +79,11 @@
 
         // Set up the interval for countdown updates
         const intervalId = setInterval(updateCountdown, 1000);
+
     });
+    function countertime(){
+        location.reload(true);
+    }
 </script>
 {% endblock shiftsecond %}
 

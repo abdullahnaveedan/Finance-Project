@@ -68,11 +68,6 @@ def get_table_data(file_path, dict_to_map):
     return group
 
 def credit_stats(data):
-    # try:
-    #     data = pd.read_excel(filepath)
-    # except Exception as e:
-    #     return f"Error processings the file: {str(e)}"
-
     data['Year'] = data['Issue Date'].dt.year  # Extract year from Issue Date
     # Group by the year of Issue Date and calculate yearly sums
     yearly_data = data.groupby('Year').agg(
@@ -201,13 +196,13 @@ def index(request):
         # Read and send excel file
         data['Recovery rate'] = (data['Capital Balance'] + data['Interest']) / data['Disbursement Amount'] * 100
         recovery_rate = data['Recovery rate'].mean() 
-        print(recovery_rate)
+        # print(recovery_rate)
         if recovery_rate > 100:
-            print("G")
+            # print("G")
             recovery_rate = math.floor(recovery_rate)
-            print(recovery_rate)
+            # print(recovery_rate)
         else:
-            print("S")
+            # print("S")
             recovery_rate = round(number, 1)
 
         recovery_rate_bins = pd.cut(data['Recovery rate'], bins=bins , labels=labels)
@@ -317,8 +312,8 @@ def index(request):
         payment_timeliness_x = list(payment_groups.keys())
         payment_timeliness_y = list(payment_groups.values())
 
-        print(data['Payment Timeliness (Months)'])
-        print(payment_timeliness_y)
+        # print(data['Payment Timeliness (Months)'])
+        # print(payment_timeliness_y)
 
             # This barchart displays the distribution of account holder's age
             # Current date for age calculation
@@ -388,7 +383,7 @@ def sign_in(request):
                     latest_record = user_record.first()
                     file = latest_record.excel_file
                     myfile = checkFile(file)
-                    print(myfile)
+                    # print(myfile)
                     if myfile == "Loan":
                         request.session['file_type'] = 'Loan'
                         return redirect("index")
@@ -452,7 +447,7 @@ def otp_validation(request):
 
         # Determine the context (signup or forget password)
         context = request.session.get('otp_context')
-        print(context)
+        # print(context)
         if context == 'forget_password':
             forget_password_data = request.session.get('forget_password')
 
@@ -543,7 +538,7 @@ def forget_password(request):
         send_otp_email(getEmail, otp)
 
         request.session['otp_context'] = 'forget_password'
-        print("Session = ", request.session.get('otp_context'))
+        # print("Session = ", request.session.get('otp_context'))
         request.session['forget_password'] = {
             'email': getEmail,
             'otp': otp,
@@ -560,7 +555,7 @@ def reset_password(request):
         new_password = request.POST.get("newPassword")
         confirm_password = request.POST.get("ConfirmPassword")
 
-        print("new_pssword = ", new_password)
+        # print("new_pssword = ", new_password)
         
         if new_password != confirm_password:
             messages.warning(request, '''Password doesn't match.''')
@@ -577,7 +572,7 @@ def reset_password(request):
                 user = User.objects.get(email=get_email)
                 user.set_password(new_password)
                 user.save()
-                print("Password saved successfully")
+                # print("Password saved successfully")
                 messages.success(request, "Your Password update successfully.")
             except User.DoesNotExist:
                 messages.error(request, "User with this email does not exist.")
@@ -591,8 +586,12 @@ def reset_password(request):
 
 @login_required(login_url='sign_in')
 def upload_file(request):
-
-    return render(request, "upload_file.html")
+    user_record = file_data.objects.filter(username = request.user).order_by('-id') 
+    data = 0
+    if len(user_record) > 0:
+        data = 1
+    context = {'data'  : data}
+    return render(request, "upload_file.html" ,context )
 
 def checkFile(file):
     file_path = os.path.join(settings.MEDIA_ROOT, str(file))
