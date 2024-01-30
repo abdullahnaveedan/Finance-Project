@@ -329,6 +329,7 @@
                                   fontColor: 'white' // Change the color of x-axis label
                                 }
                             }]
+
                         },
                         legend: {
                           labels: {
@@ -374,28 +375,44 @@
                           ]
                       },
                       options: {
-                          scales: {
-                              yAxes: [{
-                                  beginAtZero: true,
-                                  ticks: {
-                                      fontColor: 'white'
-                                  },
-                                  title: {
-                                      display: true,
-                                      color: 'white' // Change the color of y-axis label
-                                  }
-                              }],
-                              xAxes: [{
-                                  ticks: {
-                                      fontColor: 'white' // Change the color of x-axis values
-                                  },
-                                  title: {
-                                      display: true,
-                                      color: 'white' // Change the color of x-axis label
-                                  }
-                              }]
+                        scales: {
+                            yAxes: [{
+                                beginAtZero: true,
+                                ticks: {
+                                    fontColor: 'white'
+                                },
+                                title: {
+                                    display: true,
+                                    color: 'white' // Change the color of y-axis label
+                                },
+                                scaleLabel: {
+                                  display: true,
+                                  labelString: 'Frequency',
+                                  fontColor: 'white' // Change the color of x-axis label
+                                }
+                            }],
+                            xAxes: [{
+                                ticks: {
+                                    fontColor: 'white' // Change the color of x-axis values
+                                },
+                                title: {
+                                    display: true,
+                                    color: 'white' // Change the color of x-axis label
+                                },
+                                scaleLabel: {
+                                  display: true,
+                                  labelString: 'Years',
+                                  fontColor: 'white' // Change the color of x-axis label
+                                }
+                            }]
+                            
+                        },
+                        legend: {
+                          labels: {
+                              fontColor: 'white' // Set the font color of the labels
                           }
                       }
+                    }
                   });
               });
           </script>
@@ -431,10 +448,11 @@
             document.addEventListener('DOMContentLoaded', function () {
               var xValues_doubleBar = {{ loan_age_distribution.x|safe }};
               var yValues_doubleBar = {{ loan_age_distribution.y|safe }};
-              
+              var diff = 'Years';
               if ("{{ request.session.file_type }}" == "Credit") {
                 xValues_doubleBar = xValues_doubleBar[0];
                 yValues_doubleBar = yValues_doubleBar[0];
+                diff = 'Months';
               }
               
               var ctx = document.getElementById('get_time_off').getContext('2d');
@@ -480,7 +498,7 @@
                       },
                       scaleLabel: {
                         display: true,
-                        labelString: 'Years',
+                        labelString: diff,
                         fontColor: 'white' // Change the color of x-axis label
                       }
                     }]

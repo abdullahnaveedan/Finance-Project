@@ -304,7 +304,7 @@ def index(request):
         # data = data.dropna(subset=['Payment Timeliness (Months)']) #for dropping NaN values
         # Create a new column for grouping by defining custom ranges
         bins = [0,6, 12, 18,24,32, 38, 60]  # Customize the bins as per your requirements
-        labels = ['0-6 months', '6-12 months', '12-18 months', '18-24 months', '24-32 months','32-38 months','38-60 months']
+        labels = ['0 - 6', '6 - 12', '12 - 18', '18 - 24', '24 - 32','32 - 38','38 - 60']
         data['Payment Group'] = pd.cut(data['Payment Timeliness (Months)'], bins=bins, labels=labels, right=False)
 
 

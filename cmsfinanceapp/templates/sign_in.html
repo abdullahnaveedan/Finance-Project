@@ -82,15 +82,15 @@
 
 <script>
   document.getElementById("spin").style.display = 'none';
-  document.getElementById("signInButton").addEventListener("click", function (event) {
-    event.preventDefault(); // Prevents the default form submission behavior
-    document.getElementById("signInForm").submit(); // Submits the form
-  });
-  function spinner(){
-    document.getElementById("spin").style.display = 'block';
-    document.body.style.opacity = '0.5';
-      // Optionally, you can add a background overlay
-      document.getElementById("overlay").style.display = 'block';
-  }
+  function spinner() {
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
+        var spinnerContainer = document.getElementById("spin");
+        if (email.length > 0 && password.length > 0){
+          spinnerContainer.style.display = 'block';
+          spinnerContainer.style.opacity = '1';
+          document.getElementById("overlay").style.display = 'block';
+        }
+    }
 </script>
 {% endblock shiftsecond %}
