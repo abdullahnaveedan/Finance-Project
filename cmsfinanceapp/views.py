@@ -19,6 +19,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import make_password
 import math
+from statistics import mean
 # from django_pandas.io import read_frame
 
 
@@ -65,7 +66,12 @@ def get_table_data(file_path, dict_to_map):
     grouped_data_with_values['total_difference_disbursement_capitalBalance'] / grouped_data_with_values['Total_disbursement_amount']) * 100
     grouped_data_with_values['Cumulative_Percentage_Difference'] = grouped_data_with_values['Percentage_Difference'].cumsum()
     group = grouped_data_with_values.values.tolist()
-    return group
+    current_year = 2023
+    grouped_data_with_values['No. of Years'] = current_year - grouped_data_with_values['disbursement_year']
+    years = grouped_data_with_values['disbursement_year']
+    recovery_rate_list = grouped_data_with_values['Percentage_Difference'] / grouped_data_with_values['No. of Years']
+    recovery_rate = round(mean(recovery_rate_list), 2)
+    return group, list(years), list(recovery_rate_list), recovery_rate
 
 def credit_stats(data):
     data['Year'] = data['Issue Date'].dt.year  # Extract year from Issue Date
@@ -81,7 +87,7 @@ def credit_stats(data):
     yearly_data['Cumulative Percentage Difference'] = yearly_data['Percentage Difference'].cumsum()
     group = yearly_data.values.tolist()
     return group
-    
+
 # Create your views here.
 @login_required(login_url='sign_in')
 def index(request):
@@ -102,39 +108,39 @@ def index(request):
        'VALOR_CUOTA':'Installment Value', 'DIAS_ATRASO_CAPITAL': 'Days of Capital Delay', 'MESES_EN_ATRASO': 'Months in Arrears', 'SALDO_ACTUAL':'Current Balance',
        'BALANCE_CAPITAL': 'Capital Balance', 'INTERES': 'Interest', 'MORA': 'Late Payment Interest / Arrears', 'FECHA_ULTIMO_PAGO': 'Date of Last Payment',
        'MONTO_ULTIMO_PAGO': 'Amount of Last Payment', 'FECHA_CASTIGO': 'Write-Off Date'}
-        group = get_table_data(file_path, dict_to_map)
-        
+        group, years, recovery_rate_list, recovery_rate = get_table_data(file_path, dict_to_map)
+
         data = pd.read_excel(file_path)
         data = data.rename(columns = dict_to_map)
         cols_drop=['Customer Code','Disbursement Date','Date of Last Payment','Write-Off Date']
         filtered_data = data.drop(columns=cols_drop)
         mean = filtered_data.mean()
         toMean = mean.to_dict()
-    
+
         #Total rows in a dataset
         dataset_len = len(data)
-    
+
         #Total unique rows in a dataset
         unique_customers = data['Customer Code'].nunique()
-    
+
         # This data is for double bar plot of Write off count and total disbursed count by year
         # Create a new column for the write-off year
         data['write_off_year'] = data['Write-Off Date'].dt.year
-    
+
         # Calculate write-off count per year
         write_off_count_per_year = data.groupby('write_off_year')['Write-Off Date'].count()
         write_off_index = list(write_off_count_per_year.index)
         write_off_values = list(write_off_count_per_year.values)
-    
-    
+
+
         # Calculate yearly loan performance
         data['Year'] = data['Disbursement Date'].dt.year
         yearly_performance = data.groupby('Year').size()
         disbursed_index = list(yearly_performance.index)
         disbursed_values = list(yearly_performance.values)
-    
-    
-    
+
+
+
         # This data is for plot of distribution of Time to Write off
         #Time to Write-Off
         data['Time to Write-Off'] = round((data['Write-Off Date'] - data['Disbursement Date']).dt.days / 365.25)
@@ -145,7 +151,7 @@ def index(request):
         #This data is for Distribution of Days of Capital Delay
         days_of_capital_delay = data[['Days of Capital Delay']]
         daysOfCapitalDelay = list(days_of_capital_delay['Days of Capital Delay'])
-    
+
         # Analysis of Capital Balance over Time
         #This data is for Average Capital Balance Over Time
         data['Year of Last Payment'] = data['Date of Last Payment'].dt.year
@@ -158,10 +164,10 @@ def index(request):
 
 
         # Create bins using pd.cut() and count occurrences in each bin using groupby
-        
+
         # Distribution of Months in Arrears
         # This data is for plot of Distribution of Months in Arrears
-    
+
         # Loan Age (Time since disbursement to the current date or write-off date)
         # This data is for plot of Distribution of Loan Age
         data['Loan Age'] = round((pd.to_datetime('2024-01-01') - data['Disbursement Date']).dt.days / 365.25)
@@ -171,44 +177,44 @@ def index(request):
         # This data is for pie plot of Loan Size Category
         #Loan Size Category
         data['Loan Size Category'] = pd.cut(data['Disbursement Amount'], bins=[0, 100000, 500000, 1000000], labels=["Small (0 - 100K)", "Medium (100K - 500K)", "Large (500K - 1M)"])
-    
+
         # Assuming you have already calculated the proportion_by_loan_size
         proportion_by_loan_size = data['Loan Size Category'].value_counts(normalize=True)
         loanSizeIndex = list(proportion_by_loan_size.index)
         loanSizeValues = list(np.round_(proportion_by_loan_size.values*100 , decimals = 3))
-    
+
         y_index = sorted(set(disbursed_index) | set(write_off_index))
-    
+
         # Initialize a-y and b-y with zeros
         disbursed_values_updated = [0] * len(y_index)
         write_off_values_updated = [0] * len(y_index)
-    
+
         # Update a-y based on the values from disbursed_index and disbursed_values
         for i, x_value in enumerate(disbursed_index):
             index = y_index.index(x_value)
             disbursed_values_updated[index] = disbursed_values[i]
-    
+
         # Update b-y based on the values from write_off_index and write_off_values
         for i, x_value in enumerate(write_off_index):
             index = y_index.index(x_value)
             write_off_values_updated[index] = write_off_values[i]
-    
-        # Read and send excel file
-        data['Recovery rate'] = (data['Capital Balance'] + data['Interest']) / data['Disbursement Amount'] * 100
-        recovery_rate = data['Recovery rate'].mean() 
-        # print(recovery_rate)
-        if recovery_rate > 100:
-            # print("G")
-            recovery_rate = math.floor(recovery_rate)
-            # print(recovery_rate)
-        else:
-            # print("S")
-            recovery_rate = round(number, 1)
 
-        recovery_rate_bins = pd.cut(data['Recovery rate'], bins=bins , labels=labels)
-        recovery = data.groupby(recovery_rate_bins).size()
-        monthInArrearsDistribution_x = recovery.index.tolist()
-        monthInArrearsDistribution_y = recovery.values.tolist()
+        # Read and send excel file
+        # data['Recovery rate'] = (data['Capital Balance'] + data['Interest']) / data['Disbursement Amount'] * 100
+        # recovery_rate = data['Recovery rate'].mean()
+        # # print(recovery_rate)
+        # if recovery_rate > 100:
+        #     # print("G")
+        #     recovery_rate = math.floor(recovery_rate)
+        #     # print(recovery_rate)
+        # else:
+        #     # print("S")
+        #     recovery_rate = round(number, 1)
+
+        # recovery_rate_bins = pd.cut(data['Recovery rate'], bins=bins , labels=labels)
+        # recovery = data.groupby(recovery_rate_bins).size()
+        # monthInArrearsDistribution_x = recovery.index.tolist()
+        # monthInArrearsDistribution_y = recovery.values.tolist()
         context = {
                  'dataset_mean' : toMean, # Done Speedometer
                  'dataset_length':dataset_len, # Done mini-1
@@ -216,13 +222,13 @@ def index(request):
                  'doublebar': {'x': [y_index], 'y': [disbursed_values_updated],'z': [write_off_values_updated]}, # Done Stack bar
                  'time_to_write_off': {'x':timeToWriteOFF_x, 'y':timeToWriteOFF_y}, # Line bar
                  'lineGraph':{'x':[capitalBalanceIndex],'y':[capitalBalanceValues]}, # Done Line Graph
-                 'months_in_arrears_distribution':{'x' : monthInArrearsDistribution_x , 'y' : monthInArrearsDistribution_y}, # done Line bar
+                 'months_in_arrears_distribution':{'x' : years , 'y' : recovery_rate_list}, # done Line bar
                  'loan_age_distribution':{'x': loanAgeDistribution_x, 'y':loanAgeDistribution_y}, # Done Line bar
                  'proportion_by_loan_size': {'x':[loanSizeIndex],'y':[loanSizeValues]} ,# Done PIE
                  'group' : group,
                  'recovery_rate' : recovery_rate
                 }
-    
+
     elif file_type == "Credit":
         dict_to_map = {
             "MORA_PRODUCTO": "Product Delinquency",
@@ -253,7 +259,7 @@ def index(request):
             "Embargos": "Seizures"
         }
         data = data.rename(columns = dict_to_map)
-        cols_drop = ['Capital (US)', 'Minimum Payment (US)',  'Balance (US)', 
+        cols_drop = ['Capital (US)', 'Minimum Payment (US)',  'Balance (US)',
                     'Late Status', 'NO', 'Gender', 'Balance',
                     'Amount Paid', 'Number of Vehicles',
                     'Possible Asset', 'Confirmed Phone 1', 'Confirmed Phone 2', 'Seizures']
@@ -267,12 +273,12 @@ def index(request):
         filtered_data= data[['Capital (Pesos)','Amount of last payment','Balance (RD)','Minimum Payment (RD)','Capital (RD)']]
         mean = filtered_data.mean()
         toMean = mean.to_dict()
-            #length of dataset 
+            #length of dataset
         dataset_length = len(data)
-            # No. of unique customers 
+            # No. of unique customers
         unique_customers = data['CasoID'].nunique()
-        
-        
+
+
             # Ths bar chart visualize the frequency distribution of Product delinquency codes
             # Analyzing the 'Product Delinquency' column for unique values and their frequencies
         product_delinquency_insights =  dict(OrderedDict(sorted(data['Product Delinquency'].value_counts().to_dict().items())))
@@ -298,7 +304,7 @@ def index(request):
         transactions_grouped = data['Transaction Range'].value_counts().sort_index()
         transactions_x = transactions_grouped.index.tolist()
         transactions_y = transactions_grouped.values.tolist()
-          # The graph visualize the customers who paid before or after the due date 
+          # The graph visualize the customers who paid before or after the due date
           # Payment Timeliness (in days)
         data['Payment Timeliness (Months)'] = (data['Next Due Date'] - data['Date of last payment']).dt.days / 30.44
         # data = data.dropna(subset=['Payment Timeliness (Months)']) #for dropping NaN values
@@ -319,9 +325,9 @@ def index(request):
             # Current date for age calculation
         current_date = datetime.today()
         # 12. Age of Account Holder
-        
+
         # Convert 'Date of Birth' to datetime
-       
+
         data['Date of Birth'] = pd.to_datetime(data['Date of Birth'], errors='coerce')
         data = data.dropna(subset= ['Date of Birth'])
         # Calculate age and convert to integers
@@ -333,7 +339,7 @@ def index(request):
         age_x = list(age.keys())
         age_y = list(age.values())
 
-       
+
 
           # Donut chart displays the distribution of duration of credit cards
           # 1. Recalculate Loan Duration (Years)
@@ -346,12 +352,12 @@ def index(request):
         loan_duration_category_counts = data['Loan Duration Category'].value_counts()
         loanDurationIndex = list(loan_duration_category_counts.index)
         loanDurationValues = list(np.round_(loan_duration_category_counts.values*100 , decimals = 3))
-     
+
         context = {
                     'dataset_mean' : toMean, # Done
                     'proportion_by_loan_size': {'x':[loanDurationIndex],'y':[loanDurationValues]},# Done Donut
-                    'dataset_length':dataset_length, # Done 
-                    'Unique_customers':unique_customers, # Done 
+                    'dataset_length':dataset_length, # Done
+                    'Unique_customers':unique_customers, # Done
                     'months_in_arrears_distribution': {'x':[product_delinquency_insights_x],'y' : [product_delinquency_insights_y]}, # bar Done
                     'lineGraph':{'x':[capitalBalanceIndex],'y':[capitalBalanceValues]}, # D Line Graph
                     'time_to_write_off': {'x':[transactions_x] , 'y':[transactions_y]}, #  Line bar D
@@ -359,7 +365,7 @@ def index(request):
                     'age': {'x' : [age_x] , 'y' : [age_y]}, # Done Line Bar
                     'group' : groupofcredit # Done
             }
-        
+
     return render(request, "dashboard.html",context)
 
 def sign_in(request):
@@ -377,8 +383,8 @@ def sign_in(request):
             if user is not None:
                 auth_login(request, user)
                 request.session['email'] = user.email
-                user_record = file_data.objects.filter(username = request.user).order_by('-id') 
-                
+                user_record = file_data.objects.filter(username = request.user).order_by('-id')
+
                 if len(user_record) > 0:
                     latest_record = user_record.first()
                     file = latest_record.excel_file
@@ -556,7 +562,7 @@ def reset_password(request):
         confirm_password = request.POST.get("ConfirmPassword")
 
         # print("new_pssword = ", new_password)
-        
+
         if new_password != confirm_password:
             messages.warning(request, '''Password doesn't match.''')
             return render(request, "reset_password.html")
@@ -566,7 +572,7 @@ def reset_password(request):
             len(new_password) >= 8):
                 messages.warning(request, '''"Enter password containing numeric digits, alphabets and special chracters."''')
                 return render(request, "reset_password.html")
-        
+
         else:
             try:
                 user = User.objects.get(email=get_email)
@@ -586,7 +592,7 @@ def reset_password(request):
 
 @login_required(login_url='sign_in')
 def upload_file(request):
-    user_record = file_data.objects.filter(username = request.user).order_by('-id') 
+    user_record = file_data.objects.filter(username = request.user).order_by('-id')
     data = 0
     if len(user_record) > 0:
         data = 1
@@ -594,22 +600,23 @@ def upload_file(request):
     return render(request, "upload_file.html" ,context )
 
 def checkFile(file):
-    file_path = os.path.join(settings.MEDIA_ROOT, str(file))
+    file_path = os.path.join(settings.MEDIA_ROOT, file.name)
+    file_path = os.path.normpath(file_path)
     try:
-        data = pd.read_excel(file_path) 
+        data = pd.read_excel(file_path)
         dict_to_map = {
-            'CODIGO_CLIENTE': "Customer Code", 
-            'FECHA_DESEMBOLSO': "Disbursement Date", 
+            'CODIGO_CLIENTE': "Customer Code",
+            'FECHA_DESEMBOLSO': "Disbursement Date",
             'VALOR_DESEMBOLSOS':'Disbursement Amount',
-            'VALOR_CUOTA':'Installment Value', 
-            'DIAS_ATRASO_CAPITAL': 'Days of Capital Delay', 
-            'MESES_EN_ATRASO': 'Months in Arrears', 
+            'VALOR_CUOTA':'Installment Value',
+            'DIAS_ATRASO_CAPITAL': 'Days of Capital Delay',
+            'MESES_EN_ATRASO': 'Months in Arrears',
             'SALDO_ACTUAL':'Current Balance',
-            'BALANCE_CAPITAL': 'Capital Balance', 
-            'INTERES': 'Interest', 
-            'MORA': 'Late Payment Interest / Arrears', 
+            'BALANCE_CAPITAL': 'Capital Balance',
+            'INTERES': 'Interest',
+            'MORA': 'Late Payment Interest / Arrears',
             'FECHA_ULTIMO_PAGO': 'Date of Last Payment',
-            'MONTO_ULTIMO_PAGO': 'Amount of Last Payment', 
+            'MONTO_ULTIMO_PAGO': 'Amount of Last Payment',
             'FECHA_CASTIGO': 'Write-Off Date'
         }
 
@@ -649,10 +656,12 @@ def checkFile(file):
         englishFileCradit = set(list(loan_data.values()))
 
         header = set(list(data.columns.tolist()))
-       
+
         if header == englishFile or header == spanishFile:
+            print("Loan")
             return f"Loan"
         elif  header == englishFileCradit or header ==  spanishFileCradit:
+            print("Credit")
             return f"Credit"
         else:
             return False
@@ -675,7 +684,7 @@ def submit_excel(request):
         latest_record = data.first()
         file = latest_record.excel_file
         myfile = checkFile(file)
-        
+
         if myfile == "Loan":
             request.session['file_type'] = 'Loan'
             return redirect("index")
