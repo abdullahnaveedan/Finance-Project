@@ -1,0 +1,110 @@
+{% extends "structure.html" %}
+{% block title %}OTP{% endblock title %}
+{% block shiftsecond %}
+<div class="shift-second ootp">
+    {% if messages %}
+    {% for message in messages %}
+    <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible fade show mt-2" {% endif %}  style="position: absolute; left: 38%;"role="alert">
+      <strong>{{message}}</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+    <div class="container">
+        <div class="sign-up-page text-light otp" >
+            <div class="svg text-center pt-3">
+                <svg xmlns="http://www.w3.org/2000/svg"  width="70" height="70" fill="white" class="bi bi-patch-check" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M10.354 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
+                    <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z"/>                    </svg>
+                </svg>    
+            </div>
+            <div class="text text-center pt-1 otp">
+                <h3 class="text-uppercase">OTP Verification</h3>
+                <p>We will send you OTP on your given <br> <b>E-Mail</b> account.</p>
+            </div>
+            <div class="time">
+                <p class="text-center text-danger" id="countdown">
+                </p>
+            </div>
+            <div class="info">
+                <form class="form" method="POST" action="{% url 'otp_validation' %}">
+                    {% csrf_token %} <!-- Include this line to add the CSRF token -->
+
+                <div class="form-group pt-4 otpget d-flex m-4">
+                    <input type="text" class="form-control mx-4"  name="otp-1" id="otp-1" autocomplete="off" required oninput="handlePaste(this)">
+                    <input type="text" class="form-control mx-4"  name="otp-2" id="otp-2" autocomplete="off" required>
+                    <input type="text" class="form-control mx-4"  name="otp-3" id="otp-3" autocomplete="off" required>
+                    <input type="text" class="form-control mx-4"  name="otp-4" id="otp-4" autocomplete="off" required>
+                </div>
+                
+                <script>
+                    function handlePaste(firstInput) {
+                        // Get the pasted text
+                        var pastedText = firstInput.value;
+                        console.log(pastedText)
+                        // Distribute the digits to subsequent input fields
+                        for (var i = 0; i < pastedText.length; i++) {
+                            var currentInput = document.getElementById('otp-' + (i + 1));
+                            if (currentInput) {
+                                currentInput.value = pastedText[i];
+                            }
+                        }
+                    }
+                </script>
+                    
+                    
+                    <div class="text-center pt-2">
+                        <button type="submit" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-chevron-double-right" viewBox="0 0 15 15">
+                                <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
+                                <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <p class="pt-2 ">Don't receive the OTP? <button type="button" onclick="countertime()" id = "resendButton"  class="btn border-none text-light" disabled style="font-weight:600;">RESEND</button></p>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var timeInSeconds = 60; // Set the initial time (1 minute)
+
+        function updateCountdown() {
+            const minutes = Math.floor(timeInSeconds / 60);
+            const seconds = timeInSeconds % 60;
+            const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            document.getElementById('countdown').innerText = formattedTime;
+            timeInSeconds--;
+
+            if (timeInSeconds < 0) {
+                clearInterval(intervalId);
+                document.getElementById('countdown').innerText = '00:00s';
+                console.log(timeInSeconds);
+                document.getElementById('resendButton').removeAttribute('disabled');
+                // You can also disable the form or perform other actions here
+            }
+        }
+
+        // Call the function immediately to start the countdown on page load
+        updateCountdown();
+
+        // Set up the interval for countdown updates
+        const intervalId = setInterval(updateCountdown, 1000);
+
+    });
+    function countertime(){
+        location.reload(true);
+    }
+</script>
+{% endblock shiftsecond %}
+
+
+<!-- Add this script at the end of your <script> block -->
+<!-- Add this script at the end of your <script> block -->
+   
+    

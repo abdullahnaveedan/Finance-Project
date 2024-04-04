@@ -1,0 +1,102 @@
+{% extends "structure.html" %}
+{% block title %} Sign Up {% endblock title %}
+
+{% block shiftsecond %}
+<div class="shift-second">
+    {% if messages %}
+    {% for message in messages %}
+    <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible fade show mt-2" {% endif %}  style="position: absolute; left: 38%;" role="alert">
+      <strong>{{ message }}</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+  <div class="container">
+    <div class="sign-up-page text-light">
+        <div class="svg text-center pt-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" fill="white" class="bi bi-chevron-double-right" viewBox="0 0 15 15">
+                <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
+                <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
+            </svg>
+        </div>
+    
+        <div class="text text-center pt-3">
+            <h3>SIGN UP</h3>
+            <p>Welcome to our website</p>
+        </div>
+    
+        <div class="info">
+            <form class="form" method="POST" action="{% url 'sign_up' %}">
+                {% csrf_token %}
+    
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="firstname" class="form-label mx-3">First Name</label>
+                            <input type="text" class="form-control" name="firstname" id="firstname" placeholder="John" value="{{ request.POST.firstname }}" required>
+                        </div>
+                    </div>
+    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="lastname" class="form-label mx-3">Last Name</label>
+                            <input type="text" class="form-control" name="lastname" id="lastname" placeholder="Doe" value="{{ request.POST.lastname }}" required>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="username" class="form-label mx-3">Username</label>
+                            <input type="text" class="form-control" name="username" id="username" placeholder="JohnDoe22" value="{{ request.POST.username }}" required>
+                        </div>
+                    </div>
+    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email" class="form-label mx-3">Email</label>
+                            <input type="email" class="form-control" name="email" id="email" placeholder="john.doe@example.com" value="{{ request.POST.email }}" required>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="password" class="form-label mx-3">Password</label>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Type Password" autocomplete="auto-password" required>
+                        </div>
+                    </div>
+    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="cpassword" class="form-label mx-3">Confirm Password</label>
+                            <input type="password" class="form-control" name="confirmPassword" id="cPassword" placeholder="Confirm Password" autocomplete="auto-password" required>
+                        </div>
+                    </div>
+                </div>
+    
+                {% comment %} <div class="form-group">
+                    <input type="checkbox" name="checkbox" id="">
+                    I accept terms of service & <a href="#" class="text-light text-decoration-none">privacy policy.</a>
+                </div> {% endcomment %}
+    
+                <div class="text-center pt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-chevron-double-right" viewBox="0 0 15 15">
+                            <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
+                            <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
+                        </svg>
+                    </button>
+                </div>
+            </form>
+    
+            <p class="already text-center pt-3">Already have an account? <a href="{% url 'show_sign_in' %}">Log in</a></p>
+        </div>
+    </div>
+    
+      </div>
+  </div>
+</div>
+{% endblock shiftsecond %}
